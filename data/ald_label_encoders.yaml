@@ -1,0 +1,47 @@
+severity:
+  control: !!python/object/apply:numpy._core.multiarray.scalar
+  - &id001 !!python/object/apply:numpy.dtype
+    args:
+    - i8
+    - false
+    - true
+    state: !!python/tuple
+    - 3
+    - <
+    - null
+    - null
+    - null
+    - -1
+    - -1
+    - 0
+  - !!binary |
+    AAAAAAAAAAA=
+  mild: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AQAAAAAAAAA=
+  na: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AgAAAAAAAAA=
+  nan: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AwAAAAAAAAA=
+  severe: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    BAAAAAAAAAA=
+  severe_CALD: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    BQAAAAAAAAA=
+sex:
+  female: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AAAAAAAAAAA=
+  male: !!python/object/apply:numpy._core.multiarray.scalar
+  - *id001
+  - !!binary |
+    AQAAAAAAAAA=

@@ -16,8 +16,8 @@ from sklearn.impute import KNNImputer
 # --------------------------------------------------------------------
 # 1. CONFIG
 # --------------------------------------------------------------------
-RAW_MALE_FILE = "/data/43856_2024_605_MOESM4_ESM-lipidomics_data_males.xlsx"
-RAW_FEMALE_FILE = "/data/43856_2024_605_MOESM6_ESM-lipidomics_data_females.xlsx"
+RAW_MALE_FILE = "./data/43856_2024_605_MOESM4_ESM-lipidomics_data_males.xlsx"
+RAW_FEMALE_FILE = "./data/43856_2024_605_MOESM6_ESM-lipidomics_data_females.xlsx"
 MALE_SHEET = "lipidomics_data_males"
 FEMALE_SHEET = "lipidomics_data_females"
 
@@ -65,6 +65,9 @@ cat_df = df[cat_cols].copy()
 # --------------------------------------------------------------------
 # 5. HANDLE MISSINGNESS
 # --------------------------------------------------------------------
+# Drop any column that is entirely NaN after numeric conversion
+numeric_df = numeric_df.dropna(axis=1, how="all")
+
 missing_mask = numeric_df.isna().astype(int)
 with open(os.path.join(OUT_DIR, "ald_missingmask.pkl"), "wb") as f:
     pickle.dump(missing_mask, f)
@@ -101,7 +104,27 @@ with open(os.path.join(OUT_DIR, "ald_label_encoders.yaml"), "w") as f:
 # 8. REASSEMBLE CLEANED DATAFRAME
 # --------------------------------------------------------------------
 canonical_df = pd.concat([cat_df, numeric_scaled], axis=1)
-canonical_df.insert(0, "Sample_ID", df[id_cols[0]].values)
+
+# Identify columns that look like sample IDs
+id_candidates = [c for c in df.columns if "sample" in c.lower()]
+print("ID columns detected:", id_candidates)
+
+if len(id_candidates) == 1:
+    # Single clean ID column
+    sample_ids = df[id_candidates[0]].astype(str).values
+elif len(id_candidates) > 1:
+    # Multiple candidates — pick the first non-empty one
+    id_df = df[id_candidates].astype(str)
+    # Prefer column with most unique non-null entries
+    best_col = id_df.nunique().idxmax()
+    sample_ids = id_df[best_col].values
+    print(f"⚠️ Multiple ID columns found. Using '{best_col}' as Sample_ID.")
+else:
+    # Fallback: generate synthetic IDs
+    sample_ids = [f"S{i:04d}" for i in range(len(df))]
+    print("⚠️ No Sample_ID column found. Generated synthetic IDs.")
+
+canonical_df.insert(0, "Sample_ID", sample_ids)
 
 # --------------------------------------------------------------------
 # 9. COMPUTE STATISTICAL FINGERPRINT
