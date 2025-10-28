@@ -1,0 +1,44 @@
+model_name: ald_lpc_biomarkers
+n_samples: 2236
+output_dir: synthetic_data/causal_knowledge
+model_refs:
+- Billington2025
+- Jaspers2024
+nodes:
+  LPC26_0:
+    type: linear
+    parents:
+    - VLCFA_C26_0
+    - VLCFA_C26_0
+    coef:
+      intercept: 0.0
+      VLCFA_C26_0: .nan
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: Jaspers2024
+      RefNote: Recent lipidomics study
+    - RefKey: Billington2025
+      RefNote: Newborn-screen cohort
+  LPC24_0:
+    type: linear
+    parents:
+    - VLCFA_C24_0
+    coef:
+      intercept: 0.0
+      VLCFA_C24_0: 0.5
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: Jaspers2024
+      RefNote: Companion LPC marker
+  VLCFA_C26_0:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0
+  VLCFA_C24_0:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0

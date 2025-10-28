@@ -1,0 +1,5 @@
+Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
+ABCD1_loss,Peroxi_BetaOx,negative,linear,,1.2,ABCD1 mutation reduces beta-oxidation,GeneReviews2023,Authoritative clinical mechanism
+ELOVL1_activity,VLCFA_C26_0,positive,linear,,0.7,ELOVL1 elongates C22->C26,Ofman2010,ELOVL1 knockdown lowers VLCFA
+Peroxi_BetaOx,VLCFA_C26_0,negative,linear,,0.9,Lower oxidation increases C26:0,StatPearls2024,Clinical reference for VLCFA metabolism
+Diet_VLCFA_load,VLCFA_C26_0,positive,linear,,0.4,Dietary VLCFA contributes,Reactome2024,Pathway annotation

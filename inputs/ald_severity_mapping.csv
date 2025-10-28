@@ -1,0 +1,5 @@
+Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
+LPC26_0,ALD_Severity,positive,logistic,,0.8,Higher LPC26:0 predicts severe phenotype,Billington2025,Phenotype correlation
+Inflammation,ALD_Severity,positive,logistic,,0.7,Inflammation increases severity,GeneReviews2023,Clinical observation
+Age,ALD_Severity,positive,logistic,,0.02,Older age increases severity risk,StatPearls2024,Epidemiological trend
+Sex,ALD_Severity,positive,logistic,if Sex = male,0.3,Male sex bias toward cerebral ALD,GeneReviews2023,Sex-linked presentation

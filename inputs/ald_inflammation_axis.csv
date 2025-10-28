@@ -1,0 +1,4 @@
+Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
+VLCFA_C26_0,Inflammation,positive,threshold,VLCFA_C26_0 > 1.5;above=1.0;below=0.1,,C26:0 triggers inflammatory response,Jaspers2024,Inflammatory lipidomics correlations
+Inflammation,Oxidative_Stress,positive,linear,,0.8,Inflammation induces oxidative stress,GeneReviews2023,Secondary effects described
+Oxidative_Stress,Peroxi_BetaOx,negative,linear,,0.4,Oxidative stress further reduces β-oxidation,StatPearls2024,Feedback on peroxisomal function

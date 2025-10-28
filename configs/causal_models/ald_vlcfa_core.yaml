@@ -1,0 +1,56 @@
+model_name: ald_vlcfa_core
+n_samples: 2449
+output_dir: synthetic_data/causal_knowledge
+model_refs:
+- GeneReviews2023
+- Ofman2010
+- Reactome2024
+- StatPearls2024
+nodes:
+  Peroxi_BetaOx:
+    type: linear
+    parents:
+    - ABCD1_loss
+    coef:
+      intercept: 0.0
+      ABCD1_loss: 1.2
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: GeneReviews2023
+      RefNote: Authoritative clinical mechanism
+  VLCFA_C26_0:
+    type: linear
+    parents:
+    - ELOVL1_activity
+    - Peroxi_BetaOx
+    - Diet_VLCFA_load
+    coef:
+      intercept: 0.0
+      ELOVL1_activity: 0.7
+      Peroxi_BetaOx: 0.9
+      Diet_VLCFA_load: 0.4
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: Ofman2010
+      RefNote: ELOVL1 knockdown lowers VLCFA
+    - RefKey: StatPearls2024
+      RefNote: Clinical reference for VLCFA metabolism
+    - RefKey: Reactome2024
+      RefNote: Pathway annotation
+  ABCD1_loss:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0
+  ELOVL1_activity:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0
+  Diet_VLCFA_load:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0

@@ -1,0 +1,49 @@
+model_name: ald_inflammation_axis
+n_samples: 2449
+output_dir: synthetic_data/causal_knowledge
+model_refs:
+- GeneReviews2023
+- Jaspers2024
+- StatPearls2024
+nodes:
+  Inflammation:
+    type: threshold
+    parents:
+    - VLCFA_C26_0
+    coef:
+      intercept: 0.0
+      VLCFA_C26_0: .nan
+    noise_sd: 0.25
+    condition: VLCFA_C26_0 > 1.5;above=1.0;below=0.1
+    refs:
+    - RefKey: Jaspers2024
+      RefNote: Inflammatory lipidomics correlations
+  Oxidative_Stress:
+    type: linear
+    parents:
+    - Inflammation
+    coef:
+      intercept: 0.0
+      Inflammation: 0.8
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: GeneReviews2023
+      RefNote: Secondary effects described
+  Peroxi_BetaOx:
+    type: linear
+    parents:
+    - Oxidative_Stress
+    coef:
+      intercept: 0.0
+      Oxidative_Stress: 0.4
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: StatPearls2024
+      RefNote: Feedback on peroxisomal function
+  VLCFA_C26_0:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0

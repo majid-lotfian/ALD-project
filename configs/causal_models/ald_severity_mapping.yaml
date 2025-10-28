@@ -1,0 +1,53 @@
+model_name: ald_severity_mapping
+n_samples: 2236
+output_dir: synthetic_data/causal_knowledge
+model_refs:
+- Billington2025
+- GeneReviews2023
+- StatPearls2024
+nodes:
+  ALD_Severity:
+    type: logistic
+    parents:
+    - LPC26_0
+    - Inflammation
+    - Age
+    - Sex
+    coef:
+      intercept: 0.0
+      LPC26_0: 0.8
+      Inflammation: 0.7
+      Age: 0.02
+      Sex: 0.3
+    noise_sd: 0.25
+    condition: nan
+    refs:
+    - RefKey: Billington2025
+      RefNote: Phenotype correlation
+    - RefKey: GeneReviews2023
+      RefNote: Clinical observation
+    - RefKey: StatPearls2024
+      RefNote: Epidemiological trend
+    - RefKey: GeneReviews2023
+      RefNote: Sex-linked presentation
+  LPC26_0:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0
+  Inflammation:
+    type: normal
+    params:
+      mean: 0.0
+      sd: 1.0
+  Age:
+    type: truncated_normal
+    params:
+      mean: 35
+      sd: 12
+      low: 0
+      high: 100
+  Sex:
+    type: bernoulli
+    params:
+      p: 0.5
