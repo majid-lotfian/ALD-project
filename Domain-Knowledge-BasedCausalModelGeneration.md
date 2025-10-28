@@ -58,7 +58,7 @@ Example
 
 Run the parser:
 
-parse_causal_table.py
+parse_causal.py
 
 The parser will:
 1. Read each row.
