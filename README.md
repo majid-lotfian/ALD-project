@@ -24,7 +24,7 @@ Ensure columns have unique, clean names.
 
 🧼 2. Canonical dataset construction
 
-Use 1.Step1.CanonicalDatasetConstruction.py to:
+Use 1.CanonicalDatasetConstruction.py to:
 
 Impute missing values
 
