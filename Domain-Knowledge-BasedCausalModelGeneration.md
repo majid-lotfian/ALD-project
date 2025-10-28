@@ -40,13 +40,18 @@ Example
 
 🧩 Rules of thumb
 
-Use concise biochemical statements; one row = one rule.
+- Use concise biochemical statements; one row = one rule.
 
-For multiple causes, separate them by commas.
+- Each row = one causal relationship.
 
-For conditional cases, use plain phrases like if Sex = male.
+- No commas inside cells.
 
-“Direction” controls the sign of effect; “Strength” controls magnitude.
+- If multiple causes influence one effect, just add multiple rows with the same effect.
+    e.g., the last two rows both affect LPC26_0.
+
+- For conditional cases, use plain phrases like if Sex = male.
+
+- “Direction” controls the sign of effect; “Strength” controls magnitude.
 
 ⚙️ Step 2 — Generate YAML Causal Models
 
