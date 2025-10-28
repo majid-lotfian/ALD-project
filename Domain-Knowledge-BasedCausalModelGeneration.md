@@ -75,30 +75,32 @@ Example auto-generated YAML:
 model_name: ald_vlcfa
 n_samples: 5000
 output_dir: synthetic_data/causal_knowledge
-
 nodes:
-  ABCD1_loss:
-    type: bernoulli
-    params: {p: 0.5}
-
   Peroxi_BetaOx:
     type: linear
     parents: [ABCD1_loss]
-    coef: {intercept: 1.0, ABCD1_loss: -0.9}
-    noise_sd: 0.3
-
+    coef: {intercept: 0.0, ABCD1_loss: -1.2}
+    noise_sd: 0.25
   VLCFA_C26_0:
     type: linear
     parents: [Peroxi_BetaOx, ELOVL1_activity]
-    coef: {intercept: 0.2, Peroxi_BetaOx: -0.9, ELOVL1_activity: 0.6}
+    coef: {intercept: 0.0, Peroxi_BetaOx: -0.9, ELOVL1_activity: 0.7}
     noise_sd: 0.25
-
   LPC26_0:
     type: linear
     parents: [VLCFA_C26_0, Age]
-    coef: {intercept: 0.1, VLCFA_C26_0: 0.3, Age: 0.1}
-    noise_sd: 0.2
-    condition: "Sex == 'male'"
+    coef: {intercept: 0.0, VLCFA_C26_0: 0.4, Age: 0.3}
+    noise_sd: 0.25
+    condition: "Sex = male"
+  ABCD1_loss:
+    type: normal
+    params: {mean: 0.0, sd: 1.0}
+  ELOVL1_activity:
+    type: normal
+    params: {mean: 0.0, sd: 1.0}
+  Age:
+    type: normal
+    params: {mean: 0.0, sd: 1.0}
 ```
 
 
