@@ -122,3 +122,26 @@ For each YAML:
 
 Each row = one simulated patient/sample following the biological causal logic.
 
+🧩 What relationship types can be supported
+
+
+| Type          | Equation style                       | Typical use                           |
+| ------------- | ------------------------------------ | ------------------------------------- |
+| `linear`      | y = a + bX + ε                       | default numeric                       |
+| `logistic`    | P(y=1) = σ(a + bX)                   | binary outcomes                       |
+| `nonlinear`   | y = f(X², tanh, exp, log) + ε        | enzyme saturation, nonlinear kinetics |
+| `threshold`   | if X > t: use one coef; else another | diagnostic cutoffs                    |
+| `interaction` | y = a + b(X₁×X₂)                     | synergistic effects                   |
+
+
+🧩 Typical ALD-relevant nonlinear/threshold patterns
+
+| Mechanism                     | Relationship type   | Example expression             |
+| ----------------------------- | ------------------- | ------------------------------ |
+| Peroxisomal enzyme saturation | nonlinear (sigmoid) | β-oxidation vs VLCFA           |
+| Biomarker thresholds          | threshold           | LPC26:0 > 2.0 ⇒ high severity  |
+| Gene–environment synergy      | interaction         | ABCD1_loss × diet load         |
+| Progression probability       | logistic            | P(severe ALD) = σ(a + b*VLCFA) |
+
+
+
