@@ -39,9 +39,15 @@ You can choose any or all of:
 
 Copula-based models (2.1) — preserves correlations
 
-Bayesian networks (2.2a) — learns conditional dependencies
+Bayesian networks (2.2) — learns conditional dependencies
 
 CTGAN / TVAE (2.3) — learns nonlinear, multimodal patterns
+
+🧠 Causal or Knowledge-Driven Generation (2.4)
+Use this optional step to inject known causal or biological relationships into your synthetic data.
+Instead of learning all dependencies from data, you can define them explicitly using domain knowledge, such as metabolic pathways or mechanistic models.
+  - Define causal graphs manually (causal_models/*.yaml) with known parent-child relationships.
+  - Use tools like CausalNex or pgmpy to simulate data from structural equations.
 
 All models operate on any clean numeric or mixed-type DataFrame.
 
