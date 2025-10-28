@@ -1,5 +1,7 @@
 🧩 Causal Model Definition & Simulation Pipeline
 ALD-FM Synthetic Data Pipeline — Step 2.4: Domain-Knowledge-Based Generation
+
+
 🧭 Overview
 
 This subprocess lets clinicians and domain experts describe biological causal relationships in an intuitive, spreadsheet-friendly way.
