@@ -30,7 +30,7 @@ inputs/causal_relations.xlsx (or .csv) with the following columns:
 
 Example
 
-| Cause(s)         | Effect        | Direction | Type     | Condition     | Strength | Comment                                    |
+| Cause(s)         | Effect        | Direction | Type     | Condition     | Coefficient_or_Level | Comment                                    |
 | ---------------- | ------------- | --------- | -------- | ------------- | -------- | ------------------------------------------ |
 | ABCD1_loss       | Peroxi_BetaOx | negative  | linear   | —             | 1.2   | ABCD1 loss reduces β-oxidation             |
 | Peroxi_BetaOx    | VLCFA_C26_0   | negative  | linear   | —             | 0.9   | Low oxidation → high VLCFA                 |
