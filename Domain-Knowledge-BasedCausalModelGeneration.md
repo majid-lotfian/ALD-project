@@ -65,7 +65,7 @@ The parser will:
 Example auto-generated YAML:
 
 
-'''
+```
 model_name: ald_vlcfa
 n_samples: 5000
 output_dir: synthetic_data/causal_knowledge
@@ -93,7 +93,7 @@ nodes:
     coef: {intercept: 0.1, VLCFA_C26_0: 0.3, Age: 0.1}
     noise_sd: 0.2
     condition: "Sex == 'male'"
-'''
+```
 
 
 
