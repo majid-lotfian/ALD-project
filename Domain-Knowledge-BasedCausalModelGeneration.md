@@ -35,7 +35,8 @@ Example
 | ABCD1_loss       | Peroxi_BetaOx | negative  | linear   | —             | strong   | ABCD1 loss reduces β-oxidation             |
 | Peroxi_BetaOx    | VLCFA_C26_0   | negative  | linear   | —             | strong   | Low oxidation → high VLCFA                 |
 | ELOVL1_activity  | VLCFA_C26_0   | positive  | linear   | —             | moderate | Elongase synthesizes VLCFA                 |
-| VLCFA_C26_0, Age | LPC26_0       | positive  | additive | if Sex = male | weak     | More C26:0 & age increase LPC26:0 in males |
+| VLCFA_C26_0      | LPC26_0       | positive  | additive | if Sex = male | weak     | More C26:0 & age increase LPC26:0 in males |
+| Age              | LPC26_0       | positive  | additive | if Sex = male | weak     | More C26:0 & age increase LPC26:0 in males |
 
 
 🧩 Rules of thumb
