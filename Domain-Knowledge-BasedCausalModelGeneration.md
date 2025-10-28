@@ -63,10 +63,11 @@ The parser will:
 
 
 Example auto-generated YAML:
+'''
 model_name: ald_vlcfa
 n_samples: 5000
 output_dir: synthetic_data/causal_knowledge
-'''
+
 nodes:
   ABCD1_loss:
     type: bernoulli
