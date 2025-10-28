@@ -23,19 +23,19 @@ The system then automatically converts those relationships into YAML configurati
 Create or edit a spreadsheet named
 inputs/causal_relations.xlsx (or .csv) with the following columns:
 
-| Cause(s)                             | Effect                | Direction                               | Type                                      | Condition                            | Strength                     | Comment                          |
+| Cause(s)                             | Effect                | Direction                               | Type                                      | Condition                            | Coefficient_or_Level         | Comment                          |
 | ------------------------------------ | --------------------- | --------------------------------------- | ----------------------------------------- | ------------------------------------ | ---------------------------- | -------------------------------- |
-| One or more causes (comma-separated) | The variable affected | `positive` or `negative` (list allowed) | `linear`, `logistic`, `interaction`, etc. | Optional logic, e.g. `if Sex = male` | `weak`, `moderate`, `strong` | Free-text biological explanation |
+| One or more causes (comma-separated) | The variable affected | `positive` or `negative` (list allowed) | `linear`, `logistic`, `interaction`, etc. | Optional logic, e.g., `if Sex = male` | A numerical coefficient or level from the set of `weak`, `moderate`, `strong` | Free-text biological explanation |
 
 
 Example
 
 | Cause(s)         | Effect        | Direction | Type     | Condition     | Strength | Comment                                    |
 | ---------------- | ------------- | --------- | -------- | ------------- | -------- | ------------------------------------------ |
-| ABCD1_loss       | Peroxi_BetaOx | negative  | linear   | —             | strong   | ABCD1 loss reduces β-oxidation             |
-| Peroxi_BetaOx    | VLCFA_C26_0   | negative  | linear   | —             | strong   | Low oxidation → high VLCFA                 |
-| ELOVL1_activity  | VLCFA_C26_0   | positive  | linear   | —             | moderate | Elongase synthesizes VLCFA                 |
-| VLCFA_C26_0      | LPC26_0       | positive  | additive | if Sex = male | weak     | More C26:0 & age increase LPC26:0 in males |
+| ABCD1_loss       | Peroxi_BetaOx | negative  | linear   | —             | 1.2   | ABCD1 loss reduces β-oxidation             |
+| Peroxi_BetaOx    | VLCFA_C26_0   | negative  | linear   | —             | 0.9   | Low oxidation → high VLCFA                 |
+| ELOVL1_activity  | VLCFA_C26_0   | positive  | linear   | —             | 0.7 | Elongase synthesizes VLCFA                 |
+| VLCFA_C26_0      | LPC26_0       | positive  | additive | if Sex = male | 0.4     | More C26:0 & age increase LPC26:0 in males |
 | Age              | LPC26_0       | positive  | additive | if Sex = male | weak     | More C26:0 & age increase LPC26:0 in males |
 
 
@@ -63,7 +63,7 @@ parse_causal_table.py
 The parser will:
 1. Read each row.
 2. Detect causes, effects, directions, and strengths.
-3. Create numeric coefficients automatically (e.g., strong → 0.9, moderate → 0.6, weak → 0.3; sign from direction).
+3. Create numeric coefficients automatically for the specified level (e.g., strong → 0.9, moderate → 0.6, weak → 0.3; sign from direction) or using the exact numerical coefficients.
 4. Combine rows for the same effect into one node.
 5. Save one YAML file per logical group.
 
