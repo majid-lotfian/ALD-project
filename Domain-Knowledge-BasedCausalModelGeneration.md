@@ -63,6 +63,8 @@ The parser will:
 
 
 Example auto-generated YAML:
+
+
 '''
 model_name: ald_vlcfa
 n_samples: 5000
@@ -92,6 +94,8 @@ nodes:
     noise_sd: 0.2
     condition: "Sex == 'male'"
 '''
+
+
 
 💾 Step 3 — Generate Synthetic Tables
 
