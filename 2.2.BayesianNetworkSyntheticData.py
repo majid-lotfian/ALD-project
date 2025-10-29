@@ -29,8 +29,8 @@ os.makedirs(OUT_DIR, exist_ok=True)
 TOP_K_FEATURES = 1800     # keep only the top-variance features
 N_BINS = 32              # discretization bins per feature
 BLOCK_SIZE = 200         # features per BN (split into blocks)
-N_SAMPLES = 1000       # rows per synthetic table
-N_TABLES = 3             # number of synthetic tables to generate
+N_SAMPLES = 20000       # rows per synthetic table
+N_TABLES = 500            # number of synthetic tables to generate
 BASE_SEED = 42
 
 # --------------------------------------------------------------------
