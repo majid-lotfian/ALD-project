@@ -91,7 +91,7 @@ def save_outputs(name, df, metrics):
     df.to_csv(csv_path, index=False)
     with open(json_path, "w") as f:
         json.dump(metrics, f, indent=2)
-    print(f"💾 Saved {name}.csv  |  KS={metrics['ks_distance']:.4f}  CorrΔ={metrics['corr_diff']:.4f}")
+    print(f" Saved {name}.csv  |  KS={metrics['ks_distance']:.4f}  CorrΔ={metrics['corr_diff']:.4f}")
 
 # ---------------------------------------------------------------------
 # BLOCKED GAUSSIAN COPULA GENERATION
@@ -100,8 +100,18 @@ n_blocks = int(np.ceil(n_features / BLOCK_SIZE))
 print(f"Splitting {n_features} features into {n_blocks} blocks of ≤{BLOCK_SIZE} each.\n")
 
 for seed in range(N_REPEATS):
+    # ✅ Check if all 25 tables already exist for this seed
+    existing = [
+        f for f in os.listdir(OUT_DIR)
+        if f.startswith(f"gaussian_copula_seed{seed:03d}_rep") and f.endswith(".csv")
+    ]
+    if len(existing) >= TABLES_PER_MODEL:
+        print(f"[SKIP SEED] All {TABLES_PER_MODEL} tables already exist for seed {seed}.")
+        continue
+
     np.random.seed(seed)
     print(f"[SDV] Fit {seed+1}/{N_REPEATS} (seed={seed})")
+
 
     # Cache fitted block models for re-sampling
     fitted_blocks = []
@@ -109,7 +119,7 @@ for seed in range(N_REPEATS):
     for b in range(n_blocks):
         subset_cols = real_df.columns[b*BLOCK_SIZE:(b+1)*BLOCK_SIZE]
         subset = real_df[subset_cols]
-        print(f"  ⏳ Fitting block {b+1}/{n_blocks} ({subset.shape[1]} features)...")
+        print(f"  Fitting block {b+1}/{n_blocks} ({subset.shape[1]} features)...")
 
         metadata = Metadata.detect_from_dataframe(subset, table_name=f"block_{b+1}")
         gc = GaussianCopulaSynthesizer(
@@ -120,19 +130,27 @@ for seed in range(N_REPEATS):
         try:
             gc.fit(subset)
             fitted_blocks.append((b, gc, subset.columns))
-            print(f"    ✅ Block {b+1}/{n_blocks} fitted.")
+            print(f"   Block {b+1}/{n_blocks} fitted.")
         except Exception as e:
-            print(f"    ⚠️ Block {b+1} failed to fit: {e}")
+            print(f"  Block {b+1} failed to fit: {e}")
 
     # Generate multiple tables from this fitted model
     for rep in range(TABLES_PER_MODEL):
+        prefix = f"gaussian_copula_seed{seed:03d}_rep{rep:02d}"
+        csv_path = os.path.join(OUT_DIR, f"{prefix}.csv")
+        json_path = os.path.join(OUT_DIR, f"{prefix}_metrics.json")
+
+        #  Skip generation if files already exist
+        if os.path.exists(csv_path) and os.path.exists(json_path):
+            print(f"[SKIP] {prefix} already exists.")
+            continue
+
         synth_blocks = []
         for b, gc, cols in fitted_blocks:
             synth_block = gc.sample(num_rows=N_SAMPLES)
             synth_block.columns = cols
             synth_blocks.append(synth_block)
 
-        # Merge all synthetic blocks by column
         synth_gc = pd.concat(synth_blocks, axis=1).iloc[:N_SAMPLES, :]
 
         metrics = {
@@ -144,10 +162,10 @@ for seed in range(N_REPEATS):
             "corr_diff": corr_similarity(real_df.iloc[:, :len(synth_gc.columns)], synth_gc),
         }
 
-        prefix = f"gaussian_copula_seed{seed:03d}_rep{rep:02d}"
         save_outputs(prefix, synth_gc, metrics)
 
-    print(f"✅ Finished all {TABLES_PER_MODEL} tables for seed {seed}.\n")
+
+    print(f" Finished all {TABLES_PER_MODEL} tables for seed {seed}.\n")
 
 # ---------------------------------------------------------------------
 # OPTIONAL: Vine Copula (rarely used for large feature sets)
@@ -169,6 +187,6 @@ if RUN_VINE and HAVE_VINE:
             }
             save_outputs(f"vine_copula_seed{seed:03d}", synth_vc, metrics)
         except Exception as e:
-            print(f"⚠️ Vine copula failed: {e}")
+            print(f" Vine copula failed: {e}")
 
-print(f"\n✅ All synthetic generation complete. Outputs in: {OUT_DIR}")
+print(f"\n All synthetic generation complete. Outputs in: {OUT_DIR}")

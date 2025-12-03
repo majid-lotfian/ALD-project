@@ -28,9 +28,9 @@ os.makedirs(OUT_DIR, exist_ok=True)
 # Controls memory footprint
 TOP_K_FEATURES = 1800     # keep only the top-variance features
 N_BINS = 32              # discretization bins per feature
-BLOCK_SIZE = 200         # features per BN (split into blocks)
-N_SAMPLES = 20000       # rows per synthetic table
-N_TABLES = 500            # number of synthetic tables to generate
+BLOCK_SIZE = 100         # features per BN (split into blocks)
+N_SAMPLES = 10000       # rows per synthetic table
+N_TABLES = 100            # number of synthetic tables to generate
 BASE_SEED = 42
 
 # --------------------------------------------------------------------
@@ -97,17 +97,17 @@ feature_blocks = [
 
 print(f"Splitting {real_disc.shape[1]} features into {len(feature_blocks)} blocks of ≤{BLOCK_SIZE}.")
 
-for table_idx in range(N_TABLES):
+from joblib import Parallel, delayed
+
+def generate_table(table_idx):
     np.random.seed(BASE_SEED + table_idx)
     print(f"\nGenerating synthetic table {table_idx+1}/{N_TABLES}")
 
     synthetic_blocks = []
-
     for bi, cols in enumerate(feature_blocks):
         subset = real_disc[cols]
         print(f"  Fitting BN block {bi+1}/{len(feature_blocks)} on {len(cols)} features...")
 
-        # Train Bayesian Network on block
         model = BayesianNetwork.from_samples(
             subset.values,
             algorithm="chow-liu",
@@ -118,11 +118,9 @@ for table_idx in range(N_TABLES):
         synth_subset = pd.DataFrame(model.sample(N_SAMPLES, min_prob=1e-8), columns=subset.columns)
         synthetic_blocks.append(synth_subset)
 
-    # Merge all block samples horizontally
     synth_full = pd.concat(synthetic_blocks, axis=1)
-    synth_full = synth_full[real_disc.columns]  # ensure original order
+    synth_full = synth_full[real_disc.columns]
 
-    # Evaluate fidelity
     metrics = {
         "model": "BayesianNetwork-blocked",
         "seed": int(BASE_SEED + table_idx),
@@ -135,6 +133,19 @@ for table_idx in range(N_TABLES):
     }
 
     save_outputs(f"bn_table{table_idx:03d}", synth_full, metrics)
+    return table_idx
+
+# --------------------------------------------------------------------
+# PARALLEL EXECUTION ACROSS TABLES
+# --------------------------------------------------------------------
+print(f"\nRunning parallel generation of {N_TABLES} tables on available CPUs...")
+results = Parallel(n_jobs=64, backend="loky")(  # use all Genoa cores
+    delayed(generate_table)(i)
+    for i in range(N_TABLES)
+)
+print(f"\n✅ Completed all {len(results)} tables successfully.")
+
+
 
 # --------------------------------------------------------------------
 # SUMMARY

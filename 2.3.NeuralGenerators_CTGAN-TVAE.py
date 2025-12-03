@@ -40,10 +40,10 @@ OUT_DIR = "./synthetic_data/neural_sdv128"
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # How many rows per synthetic table
-N_SAMPLES = 1_000
+N_SAMPLES = 20000
 
 # How many tables per model (change this later to scale up)
-N_TABLES = 3
+N_TABLES = 100
 
 # Base seed (we’ll use BASE_SEED + table_index)
 BASE_SEED = 2025
