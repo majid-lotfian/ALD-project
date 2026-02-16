@@ -6,7 +6,7 @@ import glob
 import argparse
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
-
+from torch.cuda.amp import autocast, GradScaler
 import numpy as np
 import pandas as pd
 
@@ -19,6 +19,15 @@ from torch.utils.data import IterableDataset, DataLoader
 # =========================
 # Utilities
 # =========================
+
+# HPC friendly
+
+def set_cpu_thread_env(max_threads: int = 1):
+    os.environ.setdefault("OMP_NUM_THREADS", str(max_threads))
+    os.environ.setdefault("OPENBLAS_NUM_THREADS", str(max_threads))
+    os.environ.setdefault("MKL_NUM_THREADS", str(max_threads))
+    os.environ.setdefault("VECLIB_MAXIMUM_THREADS", str(max_threads))
+    os.environ.setdefault("NUMEXPR_NUM_THREADS", str(max_threads))
 
 def list_csv_files(root_dir: str) -> List[str]:
     pattern = os.path.join(root_dir, "**", "*.csv")
@@ -91,7 +100,8 @@ def compute_global_norm_stats(
 
     Excludes severity and IDs by construction (feature_cols must already exclude them).
     """
-    d = len(feature_cols) + 1  # +1 for sex
+    #d = len(feature_cols) + 1  # +1 for sex
+    d = len(feature_cols)  # ONLY omics features (exclude sex)
     stats = RunningStats.create(d)
 
     files = csv_files if max_files is None else csv_files[:max_files]
@@ -108,11 +118,13 @@ def compute_global_norm_stats(
             if missing:
                 raise ValueError(f"Missing feature columns in {path}: {missing[:10]} ... total {len(missing)}")
 
-            sex = chunk[sex_col].astype(np.float32).to_numpy().reshape(-1, 1)
+            '''sex = chunk[sex_col].astype(np.float32).to_numpy().reshape(-1, 1)
             x = chunk[feature_cols].astype(np.float32).to_numpy()
 
             xb = np.concatenate([x, sex], axis=1).astype(np.float64)
-            stats.update(xb)
+            stats.update(xb)'''
+            x = chunk[feature_cols].astype(np.float32).to_numpy()
+            stats.update(x.astype(np.float64))
 
     mean, std = stats.finalize()
     return {"mean": mean, "std": std}
@@ -122,7 +134,7 @@ def compute_global_norm_stats(
 # Corruptions: masking and noise
 # =========================
 
-def apply_feature_mask(
+'''def apply_feature_mask(
     x: torch.Tensor,
     mask_ratio: float,
     mask_value: float = 0.0,
@@ -145,10 +157,42 @@ def apply_feature_mask(
 
     x_masked = x.clone()
     x_masked[mask] = mask_value
+    return x_masked, mask'''
+
+def apply_feature_mask(
+    x: torch.Tensor,
+    mask_ratio: float,
+    mask_value: float = 0.0,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    x: (B, D) normalized features incl sex at last dim.
+    We do NOT mask sex by default.
+    Returns:
+      x_masked, mask (boolean tensor shape (B, D), True where masked)
+    """
+    B, D = x.shape
+    D_lip = D - 1  # last dim is sex
+
+    # Sample a Bernoulli mask for lipid dims
+    # Guarantee at least 1 masked feature per row (important when mask_ratio small)
+    mask_lip = (torch.rand((B, D_lip), device=x.device) < mask_ratio)
+
+    # Ensure each row has at least one True
+    rows_with_none = ~mask_lip.any(dim=1)
+    if rows_with_none.any():
+        # pick one random feature index for those rows
+        idx = torch.randint(0, D_lip, (rows_with_none.sum().item(),), device=x.device)
+        mask_lip[rows_with_none, idx] = True
+
+    mask = torch.zeros((B, D), dtype=torch.bool, device=x.device)
+    mask[:, :D_lip] = mask_lip
+
+    x_masked = x.clone()
+    x_masked[mask] = mask_value
     return x_masked, mask
 
 
-def apply_denoise_corruption(
+'''def apply_denoise_corruption(
     x: torch.Tensor,
     noise_std: float,
     dropout_p: float,
@@ -171,8 +215,36 @@ def apply_denoise_corruption(
         drop_mask = (torch.rand((B, D_lip), device=x.device) < dropout_p)
         x_cor[:, :D_lip][drop_mask] = drop_value
 
-    return x_cor
+    return x_cor'''
 
+def apply_denoise_corruption(
+    x: torch.Tensor,
+    noise_std: float,
+    dropout_p: float,
+    drop_value: float = 0.0,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Mild Gaussian noise + feature dropout on lipid dims only.
+    Sex dim is left intact.
+    Returns:
+      x_cor, drop_mask (boolean tensor shape (B, D), True where dropped)
+    """
+    B, D = x.shape
+    D_lip = D - 1
+
+    x_cor = x.clone()
+    drop_mask_full = torch.zeros((B, D), dtype=torch.bool, device=x.device)
+
+    if noise_std > 0:
+        noise = torch.randn((B, D_lip), device=x.device) * noise_std
+        x_cor[:, :D_lip] = x_cor[:, :D_lip] + noise
+
+    if dropout_p > 0:
+        drop_mask = (torch.rand((B, D_lip), device=x.device) < dropout_p)
+        x_cor[:, :D_lip][drop_mask] = drop_value
+        drop_mask_full[:, :D_lip] = drop_mask
+
+    return x_cor, drop_mask_full
 
 # =========================
 # Model: Residual MLP encoder + reconstruction head + optional projection head
@@ -310,7 +382,7 @@ class LipidPretrainIterable(IterableDataset):
                     if self.sex_col not in chunk.columns:
                         raise ValueError(f"sex_col='{self.sex_col}' not found in {path}")
 
-                    sex = chunk[self.sex_col].astype(np.float32).to_numpy().reshape(-1, 1)
+                    '''sex = chunk[self.sex_col].astype(np.float32).to_numpy().reshape(-1, 1)
 
                     missing = [c for c in self.feature_cols if c not in chunk.columns]
                     if missing:
@@ -319,7 +391,23 @@ class LipidPretrainIterable(IterableDataset):
                     x = chunk[self.feature_cols].astype(np.float32).to_numpy()
                     xb = np.concatenate([x, sex], axis=1)  # (N, D)
 
-                    xb = (xb - self.mean) / self.std
+                    xb = (xb - self.mean) / self.std'''
+
+
+                    sex = chunk[self.sex_col].astype(np.float32).to_numpy().reshape(-1, 1)
+
+                    missing = [c for c in self.feature_cols if c not in chunk.columns]
+                    if missing:
+                        raise ValueError(f"Missing feature columns in {path}: {missing[:10]} ... total {len(missing)}")
+
+                    # Omics features only
+                    x = chunk[self.feature_cols].astype(np.float32).to_numpy()  # (N, D_omics)
+
+                    # Normalize ONLY omics features (mean/std are shape (D_omics,))
+                    x_norm = (x - self.mean) / self.std  # (N, D_omics)
+
+                    # Append raw sex as last dim (NOT normalized)
+                    xb = np.concatenate([x_norm, sex], axis=1).astype(np.float32)  # (N, D_omics + 1)
 
                     for i in range(xb.shape[0]):
                         yield {"x": torch.from_numpy(xb[i]).float()}
@@ -366,9 +454,12 @@ def parse_args():
     ap.add_argument("--dropout", type=float, default=0.1)
 
     # SSL objectives
-    ap.add_argument("--mask_ratio", type=float, default=0.25)
+    '''ap.add_argument("--mask_ratio", type=float, default=0.25)
     ap.add_argument("--noise_std", type=float, default=0.10)
-    ap.add_argument("--feat_dropout", type=float, default=0.10)
+    ap.add_argument("--feat_dropout", type=float, default=0.10)'''
+    ap.add_argument("--mask_ratio", type=float, default=0.40)
+    ap.add_argument("--noise_std", type=float, default=0.05)
+    ap.add_argument("--feat_dropout", type=float, default=0.05)
 
     ap.add_argument("--lambda_mask", type=float, default=1.0)
     ap.add_argument("--lambda_denoise", type=float, default=0.3)
@@ -398,8 +489,29 @@ def parse_args():
     ap.add_argument("--log_every", type=int, default=200)
     ap.add_argument("--save_every", type=int, default=5000)
 
+    # HPC friendly
+    ap.add_argument("--amp", action="store_true", help="Enable mixed precision training (AMP).")
+    ap.add_argument("--amp_dtype", type=str, default="bf16", choices=["bf16", "fp16"],
+                    help="AMP dtype. bf16 recommended on A100/H100; fp16 otherwise.")
+    ap.add_argument("--prefetch_factor", type=int, default=4,
+                help="Batches prefetched per worker (only if num_workers>0).")
+    ap.add_argument("--persistent_workers", action="store_true",
+                    help="Keep DataLoader workers alive between iterations.")
+    ap.add_argument("--pin_memory", action="store_true",
+                    help="Pin CPU memory for faster H2D transfer.")
+    ap.add_argument("--cpu_threads", type=int, default=1,
+                    help="Max CPU threads per process (prevents BLAS oversubscription).")
+
+
+
+
     return ap.parse_args()
 
+
+def seed_worker(worker_id: int):
+    # Make numpy/pytorch randomness different across workers
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
 
 # =========================
 # Main
@@ -407,6 +519,9 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    set_cpu_thread_env(args.cpu_threads)
+    torch.set_num_threads(args.cpu_threads)
 
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -482,6 +597,12 @@ def main():
     print(f"[{now()}] Using {len(feature_cols)} numeric lipid features + sex => input dim {in_dim}", flush=True)
     print(f"[{now()}] Excluding columns from SSL: {drop_cols}", flush=True)
 
+
+    # Feature weights for reconstruction (downweight high-variance features)
+    # std is a numpy array of shape (D,)
+    feat_w = torch.from_numpy(1.0 / (std + 1e-6)).to(args.device)  # (D_omics,)
+    assert feat_w.shape[0] == len(feature_cols)
+
     # Dataset / Loader (streaming)
     ds = LipidPretrainIterable(
         csv_files=csv_files,
@@ -493,23 +614,41 @@ def main():
         seed=args.seed,
     )
 
-    loader = DataLoader(
+    '''loader = DataLoader(
         ds,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         pin_memory=args.device.startswith("cuda"),
         drop_last=True,
+    )'''
+
+    # HPC friendly
+
+    pin = args.pin_memory or args.device.startswith("cuda")
+
+    loader = DataLoader(
+        ds,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=pin,
+        drop_last=True,
+        persistent_workers=(args.persistent_workers and args.num_workers > 0),
+        prefetch_factor=(args.prefetch_factor if args.num_workers > 0 else None),
+        worker_init_fn=seed_worker,
+
     )
 
     # Model
     encoder = MLPEncoder(
-        in_dim=in_dim,
+        in_dim= 2 * in_dim,
         hidden_dim=args.hidden_dim,
         depth=args.depth,
         z_dim=args.z_dim,
         dropout=args.dropout,
     )
-    recon = ReconHead(z_dim=args.z_dim, out_dim=in_dim)
+    #recon = ReconHead(z_dim=args.z_dim, out_dim=in_dim)
+    omics_dim = len(feature_cols)
+    recon = ReconHead(z_dim=args.z_dim, out_dim=omics_dim)
     proj = ProjHead(z_dim=args.z_dim, p_dim=args.proj_dim) if args.use_contrastive else None
 
     encoder.to(args.device)
@@ -519,6 +658,9 @@ def main():
 
     params = list(encoder.parameters()) + list(recon.parameters()) + (list(proj.parameters()) if proj is not None else [])
     opt = torch.optim.AdamW(params, lr=args.lr, weight_decay=args.weight_decay)
+
+    use_amp = args.amp and args.device.startswith("cuda")
+    scaler = GradScaler(enabled=use_amp and args.amp_dtype == "fp16")
 
     # Resume state (model + optimizer + step)
     start_step = 0
@@ -533,6 +675,8 @@ def main():
 
         if "opt" in ckpt and ckpt["opt"] is not None:
             opt.load_state_dict(ckpt["opt"])
+            if use_amp and args.amp_dtype == "fp16" and ckpt.get("scaler") is not None:
+                scaler.load_state_dict(ckpt["scaler"])
         else:
             print(f"[{now()}] [WARN] Optimizer state missing in checkpoint; resuming with fresh optimizer.", flush=True)
 
@@ -546,7 +690,8 @@ def main():
     # Training loop
     print(f"[{now()}] Starting pretraining on device={args.device} for steps [{start_step} .. {args.steps-1}]", flush=True)
 
-    huber = nn.SmoothL1Loss(reduction="mean")
+    #huber = nn.SmoothL1Loss(reduction="mean")
+    huber = nn.SmoothL1Loss(reduction="none")
     step = start_step
     t0 = time.time()
 
@@ -556,47 +701,113 @@ def main():
         x = batch["x"].to(args.device, non_blocking=True)  # (B, D)
 
         # Corrupted views
-        x_masked, mask = apply_feature_mask(x, mask_ratio=args.mask_ratio, mask_value=0.0)
+        '''x_masked, mask = apply_feature_mask(x, mask_ratio=args.mask_ratio, mask_value=0.0)
         x_noisy = apply_denoise_corruption(x, noise_std=args.noise_std, dropout_p=args.feat_dropout, drop_value=0.0)
 
         # Forward
         z_masked = encoder(x_masked)
-        z_noisy = encoder(x_noisy)
+        z_noisy = encoder(x_noisy)'''
 
-        xhat_masked = recon(z_masked)
-        xhat_noisy = recon(z_noisy)
+        x_masked, mask = apply_feature_mask(x, mask_ratio=args.mask_ratio, mask_value=0.0)
+        x_noisy, drop_mask = apply_denoise_corruption(
+            x, noise_std=args.noise_std, dropout_p=args.feat_dropout, drop_value=0.0
+        )
 
-        # Losses:
-        # Mask loss: only masked entries (sex never masked)
-        L_mask = huber(xhat_masked[mask], x[mask]) if mask.any() else torch.tensor(0.0, device=args.device)
+        # Indicators as float (B, D)
+        mask_f = mask.float()
+        drop_f = drop_mask.float()
 
-        # Denoise loss: lipid dims only (exclude sex last dim)
-        L_denoise = huber(xhat_noisy[:, :-1], x[:, :-1])
+        # Encoder inputs become (B, 2D)
+        x_masked_in = torch.cat([x_masked, mask_f], dim=1)
+        x_noisy_in  = torch.cat([x_noisy,  drop_f], dim=1)
 
-        # Contrastive (optional, warmup)
-        L_contrast = torch.tensor(0.0, device=args.device)
-        lam_c = 0.0
-        if args.use_contrastive and proj is not None and step >= args.contrast_warmup_steps:
-            p1 = proj(z_masked)
-            p2 = proj(z_noisy)
-            L_contrast = info_nce_loss(p1, p2, temperature=args.temperature)
-            lam_c = args.lambda_contrast
+        
+        # HPC friendly
 
-        # Total
-        loss = args.lambda_mask * L_mask + args.lambda_denoise * L_denoise + lam_c * L_contrast
+        amp_dtype = torch.bfloat16 if args.amp_dtype == "bf16" else torch.float16
 
-        opt.zero_grad(set_to_none=True)
+        with autocast(device_type="cuda", dtype=amp_dtype, enabled=use_amp):
+        
+            z_masked = encoder(x_masked_in)
+            z_noisy  = encoder(x_noisy_in)
+
+            xhat_masked = recon(z_masked)
+            xhat_noisy = recon(z_noisy)
+
+            # Losses:
+            # Mask loss: only masked entries (sex never masked)
+            '''L_mask = huber(xhat_masked[mask], x[mask]) if mask.any() else torch.tensor(0.0, device=args.device)
+
+            # Denoise loss: lipid dims only (exclude sex last dim)
+            L_denoise = huber(xhat_noisy[:, :-1], x[:, :-1])'''
+
+            # Elementwise errors
+            '''err_mask_full = huber(xhat_masked, x)  # (B, D)
+            err_denoise_full = huber(xhat_noisy, x)  # (B, D)'''
+            x_omics = x[:, :-1]  # (B, D_omics) exclude sex
+
+            err_mask_full = huber(xhat_masked, x_omics)      # (B, D_omics)
+            err_denoise_full = huber(xhat_noisy, x_omics)    # (B, D_omics)
+
+            # Weighted mask loss: only masked entries (sex never masked)
+            #if mask.any():
+            mask_omics = mask[:, :-1]
+            if mask_omics.any():
+                w_mask = feat_w.unsqueeze(0).expand_as(err_mask_full)  # (B, D)
+                L_mask = (err_mask_full[mask_omics] * w_mask[mask_omics]).mean()
+            else:
+                L_mask = torch.tensor(0.0, device=args.device)
+
+            # Weighted denoise loss: lipid dims only (exclude sex last dim)
+            #w_den = feat_w[:-1].unsqueeze(0)  # (1, D-1)
+            L_denoise = (err_denoise_full * feat_w.unsqueeze(0)).mean()
+
+            # Contrastive (optional, warmup)
+            L_contrast = torch.tensor(0.0, device=args.device)
+            lam_c = 0.0
+            if args.use_contrastive and proj is not None and step >= args.contrast_warmup_steps:
+                p1 = proj(z_masked)
+                p2 = proj(z_noisy)
+                L_contrast = info_nce_loss(p1, p2, temperature=args.temperature)
+                lam_c = args.lambda_contrast
+
+            # Total
+            loss = args.lambda_mask * L_mask + args.lambda_denoise * L_denoise + lam_c * L_contrast
+
+        '''opt.zero_grad(set_to_none=True)
         loss.backward()
 
         if args.grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(params, args.grad_clip)
 
-        opt.step()
+        opt.step()'''
+
+        # HPC friendly
+
+        opt.zero_grad(set_to_none=True)
+
+        if use_amp and args.amp_dtype == "fp16":
+            scaler.scale(loss).backward()
+
+            if args.grad_clip > 0:
+                scaler.unscale_(opt)
+                torch.nn.utils.clip_grad_norm_(params, args.grad_clip)
+
+            scaler.step(opt)
+            scaler.update()
+        else:
+            loss.backward()
+
+            if args.grad_clip > 0:
+                torch.nn.utils.clip_grad_norm_(params, args.grad_clip)
+
+            opt.step()
 
         # Logging
         if step % args.log_every == 0:
             dt = time.time() - t0
             sps = (step - start_step + 1) / max(dt, 1e-9)
+            rows_per_sec = sps * args.batch_size
             print(
                 f"[{now()}] step={step:06d} "
                 f"loss={loss.item():.4f} "
@@ -604,6 +815,7 @@ def main():
                 f"Lden={L_denoise.item():.4f} "
                 f"Lcon={L_contrast.item():.4f} "
                 f"lam_con={lam_c:.3f} "
+                f"rows/s={rows_per_sec:.0f}"
                 f"sps={sps:.1f}",
                 flush=True
             )
@@ -621,6 +833,7 @@ def main():
                 "recon": recon.state_dict(),
                 "proj": proj.state_dict() if proj is not None else None,
                 "opt": opt.state_dict(),
+                "scaler": scaler.state_dict() if (use_amp and args.amp_dtype == "fp16") else None,
             }
             torch.save(state, ckpt_path)
             print(f"[{now()}] Saved checkpoint: {ckpt_path}", flush=True)
