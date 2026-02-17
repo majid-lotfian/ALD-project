@@ -817,8 +817,8 @@ def main():
                 f"Lden={L_denoise.item():.4f} "
                 f"Lcon={L_contrast.item():.4f} "
                 f"lam_con={lam_c:.3f} "
-                f"rows/s={rows_per_sec:.0f}"
-                f"sps={sps:.1f}",
+                f"sps={sps:.1f} "
+                f"rows/s={rows_per_sec:.0f}",
                 flush=True
             )
 
