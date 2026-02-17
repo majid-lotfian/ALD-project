@@ -6,7 +6,7 @@ import glob
 import argparse
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
 import numpy as np
 import pandas as pd
 
@@ -660,7 +660,8 @@ def main():
     opt = torch.optim.AdamW(params, lr=args.lr, weight_decay=args.weight_decay)
 
     use_amp = args.amp and args.device.startswith("cuda")
-    scaler = GradScaler(enabled=use_amp and args.amp_dtype == "fp16")
+    #scaler = GradScaler(enabled=use_amp and args.amp_dtype == "fp16")
+    scaler = GradScaler("cuda", enabled=use_amp and args.amp_dtype == "fp16")
 
     # Resume state (model + optimizer + step)
     start_step = 0
@@ -726,7 +727,8 @@ def main():
 
         amp_dtype = torch.bfloat16 if args.amp_dtype == "bf16" else torch.float16
 
-        with autocast(device_type="cuda", dtype=amp_dtype, enabled=use_amp):
+        #with autocast(device_type="cuda", dtype=amp_dtype, enabled=use_amp):
+        with autocast("cuda", dtype=amp_dtype, enabled=use_amp):
         
             z_masked = encoder(x_masked_in)
             z_noisy  = encoder(x_noisy_in)
