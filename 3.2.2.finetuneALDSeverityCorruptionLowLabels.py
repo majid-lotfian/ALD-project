@@ -69,6 +69,45 @@ class ClassifierHead(nn.Module):
 # -------------------------
 # Utils
 # -------------------------
+def apply_feature_mask_ft(x: torch.Tensor, mask_ratio: float, mask_value: float = 0.0):
+    # x: (B, D) where D = D_omics+1 (sex last)
+    B, D = x.shape
+    D_omics = D - 1
+
+    mask_omics = (torch.rand((B, D_omics), device=x.device) < mask_ratio)
+    # ensure at least one masked per row when mask_ratio>0
+    if mask_ratio > 0:
+        rows_with_none = ~mask_omics.any(dim=1)
+        if rows_with_none.any():
+            idx = torch.randint(0, D_omics, (rows_with_none.sum().item(),), device=x.device)
+            mask_omics[rows_with_none, idx] = True
+
+    mask = torch.zeros((B, D), dtype=torch.bool, device=x.device)
+    mask[:, :D_omics] = mask_omics
+
+    x_masked = x.clone()
+    x_masked[mask] = mask_value
+    return x_masked, mask
+
+def apply_denoise_corruption_ft(x: torch.Tensor, noise_std: float, dropout_p: float, drop_value: float = 0.0):
+    # x: (B, D), sex last untouched by dropout (but can still get noise if you want; we keep it clean)
+    B, D = x.shape
+    D_omics = D - 1
+
+    x_cor = x.clone()
+    drop_mask = torch.zeros((B, D), dtype=torch.bool, device=x.device)
+
+    if noise_std > 0:
+        noise = torch.randn((B, D_omics), device=x.device) * noise_std
+        x_cor[:, :D_omics] = x_cor[:, :D_omics] + noise
+
+    if dropout_p > 0:
+        dm = (torch.rand((B, D_omics), device=x.device) < dropout_p)
+        x_cor[:, :D_omics][dm] = drop_value
+        drop_mask[:, :D_omics] = dm
+
+    return x_cor, drop_mask
+
 
 def set_seed(seed: int):
     np.random.seed(seed)
@@ -188,14 +227,58 @@ def parse_args():
 
     ap.add_argument("--unfreeze_in_proj", action="store_true",
                     help="If set, allow in_proj to adapt (recommended for your current finetune input).")
-    
+    ap.add_argument("--ft_use_corrupt_train", action="store_true",
+                    help="If set, apply pretrain-like corruptions during finetune training and pass indicators to encoder.")
+    ap.add_argument("--ft_mask_ratio", type=float, default=0.2)
+    ap.add_argument("--ft_noise_std", type=float, default=0.02)
+    ap.add_argument("--ft_feat_dropout", type=float, default=0.02)
 
+    ap.add_argument("--label_frac", type=float, default=1.0,
+                    help="Fraction of TRAIN labels used per fold (e.g., 0.1, 0.25, 0.5, 1.0). Validation stays full.")
+    ap.add_argument("--label_min_per_class", type=int, default=2,
+                    help="Minimum number of samples per class to keep in the TRAIN subset (if available).")
+    ap.add_argument("--label_seed", type=int, default=123,
+                    help="Seed for label subsampling (in addition to --seed).")
     return ap.parse_args()
+
+
+
+def stratified_subsample_indices(y: np.ndarray, frac: float, min_per_class: int, seed: int) -> np.ndarray:
+    """
+    y: labels for the TRAIN fold
+    frac: fraction to keep (0<frac<=1)
+    Returns indices (relative to y) for a stratified subset.
+    """
+    if frac >= 1.0:
+        return np.arange(len(y), dtype=np.int64)
+
+    rng = np.random.default_rng(seed)
+    keep = []
+
+    classes = np.unique(y)
+    for c in classes:
+        idx = np.where(y == c)[0]
+        if len(idx) == 0:
+            continue
+        k = int(np.ceil(frac * len(idx)))
+        k = max(1, k)  # keep at least 1 if class exists
+        k = max(min_per_class, k) if len(idx) >= min_per_class else min(1, len(idx))
+        k = min(k, len(idx))
+        pick = rng.choice(idx, size=k, replace=False)
+        keep.append(pick)
+
+    keep = np.concatenate(keep) if keep else np.array([], dtype=np.int64)
+    rng.shuffle(keep)
+    return keep.astype(np.int64)
 
 
 # -------------------------
 # Main
 # -------------------------
+
+
+
+
 
 def main():
     args = parse_args()
@@ -308,7 +391,7 @@ def main():
         opt = torch.optim.AdamW(params, weight_decay=cfg.weight_decay)
 
         # Norm stats
-        if args.norm_mode == "pretrain":
+        '''if args.norm_mode == "pretrain":
             mean, std = mean_pre, std_pre
         else:
             mean, std = compute_fold_stats(X_omics[tr_idx])
@@ -322,15 +405,75 @@ def main():
         ytr = y[tr_idx].astype(np.int64)
         yva = y[va_idx].astype(np.int64)
 
+        # --- Low-label regime: stratified subsample of TRAIN fold only
+        if args.label_frac < 1.0:
+            sub_seed = args.label_seed + args.seed * 1000 + fold  # stable + fold-specific
+            rel_keep = stratified_subsample_indices(ytr, args.label_frac, args.label_min_per_class, sub_seed)
+
+            tr_idx = tr_idx[rel_keep]  # update absolute train indices
+            ytr = y[tr_idx].astype(np.int64)  # recompute ytr from updated indices
+
+            # Recompute Xtr arrays after updating tr_idx (do this BEFORE creating Xtr/Xva tensors)
+            # (So: move your normalization + concatenation block to happen AFTER this point.)
+
+            print(f"[Fold {fold}] Low-label: using {len(tr_idx)} train samples (label_frac={args.label_frac})", flush=True)'''
+
+        # Labels first (needed for stratified subsampling)
+        ytr = y[tr_idx].astype(np.int64)
+        yva = y[va_idx].astype(np.int64)
+
+        # --- Low-label regime: stratified subsample of TRAIN fold only
+        if args.label_frac < 1.0:
+            sub_seed = args.label_seed + args.seed * 1000 + fold  # stable + fold-specific
+            rel_keep = stratified_subsample_indices(ytr, args.label_frac, args.label_min_per_class, sub_seed)
+
+            tr_idx = tr_idx[rel_keep]               # update absolute train indices
+            ytr = y[tr_idx].astype(np.int64)        # recompute ytr after subsample
+            print(f"[Fold {fold}] Low-label: using {len(tr_idx)} train samples (label_frac={args.label_frac})", flush=True)
+            print(f"[Fold {fold}] train counts after subsample: {np.bincount(ytr, minlength=n_classes)}", flush=True)
+
+
+        # Norm stats (IMPORTANT: if fold norm, compute on UPDATED tr_idx)
+        if args.norm_mode == "pretrain":
+            mean, std = mean_pre, std_pre
+        else:
+            mean, std = compute_fold_stats(X_omics[tr_idx])
+
+        # Normalize omics only; append raw sex as last dim
+        Xtr = (X_omics[tr_idx] - mean) / std
+        Xva = (X_omics[va_idx] - mean) / std
+        Xtr = np.concatenate([Xtr, sex[tr_idx]], axis=1).astype(np.float32)  # (Ntr, D_omics+1)
+        Xva = np.concatenate([Xva, sex[va_idx]], axis=1).astype(np.float32)
+
+
         Xtr_t = torch.from_numpy(Xtr).to(device)
         Xva_t = torch.from_numpy(Xva).to(device)
         ytr_t = torch.from_numpy(ytr).to(device)
         yva_t = torch.from_numpy(yva).to(device)
 
         # Build indicator channels (no corruption -> zeros)
-        zeros_tr = torch.zeros_like(Xtr_t)
+        '''#zeros_tr = torch.zeros_like(Xtr_t)
+        if args.ft_use_corrupt_train:
+            # masked view (indicator = mask)
+            x_masked, mask = apply_feature_mask_ft(Xtr_t, mask_ratio=args.ft_mask_ratio, mask_value=0.0)
+            Xtr_in = torch.cat([x_masked, mask.float()], dim=1)
+
+            # OPTIONAL alternative: noisy/drop view (indicator = drop_mask)
+            # x_noisy, drop_mask = apply_denoise_corruption_ft(Xtr_t, noise_std=args.ft_noise_std,
+            #                                                  dropout_p=args.ft_feat_dropout, drop_value=0.0)
+            # Xtr_in = torch.cat([x_noisy, drop_mask.float()], dim=1)
+        else:
+            zeros_tr = torch.zeros_like(Xtr_t)
+            Xtr_in = torch.cat([Xtr_t, zeros_tr], dim=1)
         zeros_va = torch.zeros_like(Xva_t)
-        Xtr_in = torch.cat([Xtr_t, zeros_tr], dim=1)  # (Ntr, 2*(D_omics+1))
+        #Xtr_in = torch.cat([Xtr_t, zeros_tr], dim=1)  # (Ntr, 2*(D_omics+1))
+        Xva_in = torch.cat([Xva_t, zeros_va], dim=1)'''
+
+        # Keep clean training features; we will corrupt per-batch inside the training loop
+        Xtr_base = Xtr_t
+
+        # Validation always uses clean features with zero indicators
+        zeros_va = torch.zeros_like(Xva_t)
         Xva_in = torch.cat([Xva_t, zeros_va], dim=1)
 
         class_w = make_class_weights(ytr, n_classes).to(device)
@@ -344,13 +487,29 @@ def main():
             encoder.train()
             head.train()
 
-            for xb, yb in batch_iter(Xtr_in, ytr_t, cfg.batch_size, shuffle=True):
+            '''for xb, yb in batch_iter(Xtr_in, ytr_t, cfg.batch_size, shuffle=True):
                 opt.zero_grad(set_to_none=True)
 
                 with autocast("cuda", dtype=amp_dtype, enabled=cfg.amp):
                     z = encoder(xb)
                     logits = head(z)
-                    loss = criterion(logits, yb)
+                    loss = criterion(logits, yb)'''
+            for xb_clean, yb in batch_iter(Xtr_base, ytr_t, cfg.batch_size, shuffle=True):
+                opt.zero_grad(set_to_none=True)
+
+                # Apply corruption per batch (fresh every iteration)
+                if args.ft_use_corrupt_train:
+                    xb_masked, mask = apply_feature_mask_ft(
+                        xb_clean, mask_ratio=args.ft_mask_ratio, mask_value=0.0
+                    )
+                    xb = torch.cat([xb_masked, mask.float()], dim=1)
+                else:
+                    xb = torch.cat([xb_clean, torch.zeros_like(xb_clean)], dim=1)
+
+                with autocast("cuda", dtype=amp_dtype, enabled=cfg.amp):
+                    z = encoder(xb)
+                    logits = head(z)
+                    loss = criterion(logits, yb)    
 
                 if cfg.amp and cfg.amp_dtype == "fp16":
                     scaler.scale(loss).backward()
