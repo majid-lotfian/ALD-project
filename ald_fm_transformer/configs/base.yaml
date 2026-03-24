@@ -9,6 +9,12 @@ num_heads: 6
 dropout: 0.1
 use_cls: true
 
+paths:
+data_root: data/
+synthetic_root: data/synthetic/
+real_root: data/real/
+output_root: outputs/
+
 data:
 batch_size: 32
 num_workers: 4

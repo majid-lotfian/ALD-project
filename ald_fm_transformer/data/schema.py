@@ -11,7 +11,6 @@ import pandas as pd
 class FeatureSchema:
     feature_cols: List[str]
     sex_col: Optional[str]
-    age_col: Optional[str]
     severity_col: Optional[str]
     id_col: Optional[str]
     exclude_cols: List[str]
@@ -24,7 +23,6 @@ class FeatureSchema:
 def infer_feature_schema(
     df: pd.DataFrame,
     sex_col: str = 'sex',
-    age_col: str = 'age',
     severity_col: str = 'severity',
     id_col: str = 'Sample_ID',
     exclude_cols: Optional[Iterable[str]] = None,
@@ -40,7 +38,6 @@ def infer_feature_schema(
     return FeatureSchema(
         feature_cols=keep,
         sex_col=sex_col if sex_col in df.columns else None,
-        age_col=age_col if age_col in df.columns else None,
         severity_col=severity_col if severity_col in df.columns else None,
         id_col=id_col if id_col in df.columns else None,
         exclude_cols=list(exclude),
