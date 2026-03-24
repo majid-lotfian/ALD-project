@@ -14,7 +14,7 @@ from data.preprocessing import NormStats, compute_norm_stats_from_array, normali
 from data.schema import infer_feature_schema
 from losses.classification import make_ce_loss, make_class_weights
 from model.heads import ClassificationHead
-from model.transformer import TabularTransformerEncoder
+from model.transformer_encoder import TabularTransformerEncoder
 from training.checkpointing import load_checkpoint
 from training.trainer_finetune import FinetuneTrainer, FinetuneTrainerConfig
 from utils.config import load_yaml_config

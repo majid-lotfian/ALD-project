@@ -13,7 +13,7 @@ from data.preprocessing import compute_norm_stats_from_files
 from data.schema import infer_feature_schema, save_schema
 from model.heads import SharedRegressionHead
 from model.masking import MaskingConfig
-from model.transformer import TabularTransformerEncoder
+from model.transformer_encoder import TabularTransformerEncoder
 from training.optimizer import build_optimizer
 from training.trainer_pretrain import PretrainTrainer, PretrainTrainerConfig
 from utils.config import load_yaml_config, deep_update
