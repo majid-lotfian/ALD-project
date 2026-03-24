@@ -3,7 +3,7 @@ from __future__ import annotations
 import torch
 import torch.nn as nn
 
-from .embeddings import FeatureTokenizer
+from .token_embeddings import FeatureTokenizer
 
 
 class TabularTransformerEncoder(nn.Module):
