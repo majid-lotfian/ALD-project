@@ -28,10 +28,10 @@ class FinetuneDataset(Dataset):
         }
 
 
-def load_real_table(real_csv: str, schema: FeatureSchema, severity_col: str) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame]:
+def load_real_table(real_csv: str, schema: FeatureSchema, target_column: str) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     df = pd.read_csv(real_csv)
     x = df.reindex(columns=schema.feature_cols).astype(np.float32).to_numpy()
-    y = df[severity_col].astype(int).to_numpy()
+    y = df[target_column].astype(int).to_numpy()
     return x, y, df
 
 

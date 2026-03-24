@@ -67,7 +67,7 @@ def main():
 
     set_seed(cfg['experiment']['seed'])
     run_name = cfg['experiment']['name'] + ('_scratch' if cfg['finetuning']['from_scratch'] else '_pretrained')
-    run_dir = ensure_dir(Path(cfg['experiment']['output_root']) / 'runs' / 'finetune' / run_name)
+    run_dir = ensure_dir(Path(cfg['paths']['output_root']) / 'runs' / 'finetune' / run_name)
     logger = make_logger(run_dir / 'console.log')
 
     df = pd.read_csv(cfg['data']['real_csv'])
@@ -75,11 +75,11 @@ def main():
         df,
         sex_col=cfg['data']['sex_col'],
         age_col=cfg['data'].get('age_col', 'age'),
-        severity_col=cfg['data']['severity_col'],
+        target_column=cfg['data']['target_column'],
         id_col=cfg['data']['id_col'],
         exclude_cols=cfg['data'].get('exclude_cols', []),
     )
-    x, y, df = load_real_table(cfg['data']['real_csv'], schema, cfg['data']['severity_col'])
+    x, y, df = load_real_table(cfg['data']['real_csv'], schema, cfg['data']['target_column'])
     n_classes = int(np.max(y)) + 1
     splits = make_cv_splits(y, cfg['finetuning']['splits'], cfg['experiment']['seed'])
     device = 'cuda' if torch.cuda.is_available() else 'cpu'

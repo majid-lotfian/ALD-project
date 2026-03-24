@@ -41,7 +41,7 @@ def main():
 
     set_seed(cfg['experiment']['seed'])
     run_name = cfg['experiment']['name'] + '_' + '-'.join(cfg['data']['input_folders'])
-    run_dir = ensure_dir(Path(cfg['experiment']['output_root']) / 'runs' / 'pretrain' / run_name)
+    run_dir = ensure_dir(Path(cfg['paths']['output_root']) / 'runs' / 'pretrain' / run_name)
     logger = make_logger(run_dir / 'console.log')
 
     csv_files = discover_family_csvs(cfg['data']['synthetic_root'], cfg['data']['input_folders'], cfg['data'].get('file_glob', '*.csv'), cfg['data'].get('max_files'))
@@ -53,7 +53,6 @@ def main():
     schema = infer_feature_schema(
         df0,
         sex_col=cfg['data']['sex_col'],
-        age_col=cfg['data'].get('age_col', 'age'),
         severity_col=cfg['data']['severity_col'],
         id_col=cfg['data']['id_col'],
         exclude_cols=cfg['data'].get('exclude_cols', []),
@@ -61,7 +60,7 @@ def main():
     save_schema(schema, run_dir / 'feature_schema.json')
     norm_stats = compute_norm_stats_from_files(csv_files, schema.feature_cols)
 
-    train_files, val_files = train_test_split(csv_files, test_size=cfg['pretraining']['val_fraction'], random_state=cfg['experiment']['seed'])
+    train_files, val_files = train_test_split(csv_files, test_size=cfg['validation']['split_ratio'], random_state=cfg['experiment']['seed'])
     train_ds = PretrainCSVDataset(train_files, schema, norm_stats)
     val_ds = PretrainCSVDataset(val_files, schema, norm_stats)
     train_loader = make_loader(train_ds, cfg['data']['batch_size'], True, cfg['data']['num_workers'], cfg['data']['pin_memory'])
