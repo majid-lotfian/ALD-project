@@ -4,6 +4,7 @@ experiment:
 data:
   input_folders: ["copula"]
   max_rows: null
+  synthetic_root: ../synthetic_data/
 
 pretraining:
   mask_ratio: 0.4

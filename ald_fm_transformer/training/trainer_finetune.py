@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import torch
-from torch.amp import GradScaler, autocast
+from torch.cuda.amp import GradScaler, autocast
 
 from evaluation.metrics_finetune import compute_classification_metrics
 from training.checkpointing import save_checkpoint

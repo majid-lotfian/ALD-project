@@ -53,7 +53,7 @@ def main():
     schema = infer_feature_schema(
         df0,
         sex_col=cfg['data']['sex_col'],
-        severity_col=cfg['data']['severity_col'],
+        target_column=cfg['data']['target_column'],
         id_col=cfg['data']['id_col'],
         exclude_cols=cfg['data'].get('exclude_cols', []),
     )

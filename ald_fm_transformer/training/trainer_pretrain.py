@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import torch
-from torch.amp import GradScaler, autocast
+from torch.cuda.amp import GradScaler, autocast
 
 from evaluation.metrics_pretrain import pretrain_metrics
 from losses.masked_regression import masked_mse_loss
