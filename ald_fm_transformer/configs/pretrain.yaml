@@ -3,6 +3,7 @@ name: pretrain
 
 data:
 input_folders: ["copula"]
+max_rows: null
 
 pretraining:
 mask_ratio: 0.4
@@ -13,3 +14,6 @@ epochs: 50
 
 checkpoint:
 save_dir: outputs/checkpoints/pretrain
+
+validation:
+split_ratio: 0.1

@@ -12,7 +12,7 @@ use_cls: true
 data:
 batch_size: 32
 num_workers: 4
-feature_exclude: ["label"]
+feature_exclude: ["Sample_ID", "severity"]
 
 optimizer:
 lr: 1e-4
