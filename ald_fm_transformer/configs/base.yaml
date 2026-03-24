@@ -1,0 +1,19 @@
+experiment:
+name: default
+seed: 42
+
+model:
+d_model: 192
+num_layers: 4
+num_heads: 6
+dropout: 0.1
+use_cls: true
+
+data:
+batch_size: 32
+num_workers: 4
+feature_exclude: ["label"]
+
+optimizer:
+lr: 1e-4
+weight_decay: 1e-4

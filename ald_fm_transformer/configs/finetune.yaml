@@ -1,0 +1,12 @@
+experiment:
+name: finetune
+
+data:
+real_data_path: data/real/ald_dataset.csv
+
+training:
+epochs: 50
+
+checkpoint:
+save_dir: outputs/checkpoints/finetune
+pretrained_path: null

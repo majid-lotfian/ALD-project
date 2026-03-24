@@ -1,0 +1,15 @@
+experiment:
+name: pretrain
+
+data:
+input_folders: ["copula"]
+
+pretraining:
+mask_ratio: 0.4
+mask_prob: 0.8
+random_replace_prob: 0.1
+keep_prob: 0.1
+epochs: 50
+
+checkpoint:
+save_dir: outputs/checkpoints/pretrain
