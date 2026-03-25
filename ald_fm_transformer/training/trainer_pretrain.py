@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import torch
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 from evaluation.metrics_pretrain import pretrain_metrics
 from losses.masked_regression import masked_mse_loss
@@ -39,7 +39,7 @@ class PretrainTrainer:
         self.norm_stats = norm_stats
         self.config_snapshot = config_snapshot
         self.csv_logger = CSVLogger(Path(cfg.run_dir) / 'train_log.csv', ['epoch', 'split', 'loss', 'masked_mse'])
-        self.scaler = GradScaler(enabled=cfg.amp and cfg.amp_dtype == 'fp16')
+        self.scaler = GradScaler('cuda', enabled=cfg.amp and cfg.amp_dtype == 'fp16')
         ensure_dir(Path(cfg.run_dir) / 'checkpoints')
 
     def _step(self, batch, train: bool) -> Dict[str, float]:

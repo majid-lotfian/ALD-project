@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import torch
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 from evaluation.metrics_finetune import compute_classification_metrics
 from training.checkpointing import save_checkpoint
@@ -34,7 +34,7 @@ class FinetuneTrainer:
         self.val_loader = val_loader
         self.cfg = cfg
         self.logger = logger
-        self.scaler = GradScaler(enabled=cfg.amp and cfg.amp_dtype == 'fp16')
+        self.scaler = GradScaler('cuda', enabled=cfg.amp and cfg.amp_dtype == 'fp16')
         self.csv_logger = CSVLogger(Path(cfg.run_dir) / 'train_log.csv', ['epoch', 'split', 'loss', 'accuracy', 'macro_f1', 'balanced_accuracy'])
         save_json(config_snapshot, Path(cfg.run_dir) / 'config_used.json')
 
