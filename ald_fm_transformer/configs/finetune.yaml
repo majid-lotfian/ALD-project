@@ -1,0 +1,30 @@
+experiment:
+  name: finetune
+
+data:
+  real_csv: data/real/ald_dataset.csv
+  target_column: severity
+  batch_size: 16
+
+
+
+finetuning:
+  from_scratch: false
+  ckpt_path: null
+  splits: 3
+  label_frac: 1.0
+  label_min_per_class: 1
+  freeze_mode: full
+  unfreeze_last_layers: 1
+  lr_encoder: 1e-5
+  lr_head: 1e-4
+  epochs: 50
+  patience: 10
+  amp: true
+  amp_dtype: bf16
+  grad_accum_steps: 1
+  clip_grad_norm: 1.0
+
+checkpoint:
+  save_dir: outputs/checkpoints/finetune
+  pretrained_path: null     #null → from scratch    or checkpoint path → pretrained initialization
