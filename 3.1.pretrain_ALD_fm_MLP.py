@@ -15,6 +15,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import IterableDataset, DataLoader
 
+''' to run the code
+use this command:
+python 3.1.pretrain_ALD_fm_MLP.py --synthetic_root ./synthetic_data/copula --out_dir ./pretrain_runs/copula_only
+
+
+'''
 
 # =========================
 # Utilities
