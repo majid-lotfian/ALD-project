@@ -1,0 +1,25 @@
+experiment:
+  name: default
+  seed: 42
+
+model:
+  d_model: 192
+  num_layers: 4
+  num_heads: 6
+  dropout: 0.1
+  use_cls: true
+
+paths:
+  data_root: data/
+  synthetic_root: data/synthetic/
+  real_root: data/real/
+  output_root: outputs/
+
+data:
+  batch_size: 32
+  num_workers: 4
+  feature_exclude: ["Sample_ID", "severity"]
+
+optimizer:
+  lr: 1e-4
+  weight_decay: 1e-4

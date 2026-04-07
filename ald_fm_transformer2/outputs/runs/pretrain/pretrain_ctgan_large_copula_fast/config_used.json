@@ -1,0 +1,58 @@
+{
+  "experiment": {
+    "name": "pretrain_ctgan_large",
+    "seed": 42
+  },
+  "paths": {
+    "output_root": "outputs/"
+  },
+  "data": {
+    "input_folders": [
+      "copula_fast"
+    ],
+    "synthetic_root": "../synthetic_data/",
+    "batch_size": 16,
+    "num_workers": 4,
+    "pin_memory": true,
+    "chunksize": 4096,
+    "prefetch_factor": 2,
+    "persistent_workers": true,
+    "max_files": 2,
+    "max_rows_per_file": null,
+    "file_glob": "*.csv",
+    "sex_col": "sex",
+    "id_col": "Sample_ID",
+    "exclude_cols": [],
+    "target_column": "severity"
+  },
+  "model": {
+    "d_model": 192,
+    "num_layers": 4,
+    "nhead": 6,
+    "dropout": 0.1,
+    "use_cls": true,
+    "value_hidden_dim": 64,
+    "value_encoder_layers": 2
+  },
+  "optimizer": {
+    "name": "adamw",
+    "lr": 0.001,
+    "weight_decay": 0.0001
+  },
+  "validation": {
+    "split_ratio": 0.1
+  },
+  "pretraining": {
+    "epochs": 10,
+    "steps_per_epoch": 1000,
+    "val_steps": 100,
+    "mask_ratio": 0.15,
+    "mask_token_prob": 0.8,
+    "random_replace_prob": 0.1,
+    "keep_original_prob": 0.1,
+    "amp": true,
+    "amp_dtype": "bf16",
+    "grad_accum_steps": 2,
+    "clip_grad_norm": 1.0
+  }
+}
