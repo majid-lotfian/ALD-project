@@ -1,4 +1,7 @@
 Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
-VLCFA_C26_0,LPC26_0,positive,linear,,0.6,High C26:0 increases C26:0-LPC,Jaspers2024,Recent lipidomics study
-VLCFA_C26_0,LPC26_0,positive,threshold,VLCFA_C26_0 > 1.5;above=1.0;below=0.2,,Threshold rise of LPC26:0,Billington2025,Newborn-screen cohort
-VLCFA_C24_0,LPC24_0,positive,linear,,0.5,High C24:0 increases LPC24:0,Jaspers2024,Companion LPC marker
+VLCFA_C26_0,LPC26_0,positive,linear,,0.6,C26:0-CoA incorporated into PC via LPCAT; iPLA2 cleaves → LPC 26:0 (Lands cycle),Jaspers2024,Plasma lipidomics biomarker study
+VLCFA_C26_0,LPC26_0,positive,threshold,VLCFA_C26_0 > 1.5;above=1.0;below=0.2,,Nonlinear threshold elevation of LPC 26:0 at high VLCFA burden; validated in NBS cohort,Billington2025,Newborn screening cohort
+VLCFA_C24_0,LPC24_0,positive,linear,,0.5,Parallel Lands cycle disruption: C24:0-containing PC cleaved by iPLA2 → LPC 24:0,Jaspers2024,Companion LPC marker
+Oxidative_Stress,LPC26_0,positive,linear,,0.4,ROS activates iPLA2/PLA2G6 → phospholipid hydrolysis releases LPC 26:0 from VLCFA-PC species,Engelen2024,Lands cycle disruption second route
+Oxidative_Stress,LPC24_0,positive,linear,,0.35,ROS-mediated iPLA2 activation also releases LPC 24:0 from C24:0-containing PC,Engelen2024,Lands cycle disruption second route
+LPC26_0,LPA,positive,linear,,0.25,Autotaxin (ENPP2) converts LPC 26:0 → lysophosphatidic acid (LPA); LPA signals via LPA receptors,Fourcade2008,Hum Mol Genet 2008 (PMID 18628207)

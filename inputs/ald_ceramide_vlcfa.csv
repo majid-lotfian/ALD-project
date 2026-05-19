@@ -1,0 +1,9 @@
+Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
+VLCFA_C26_0,Ceramide_VLCFA,positive,linear,,0.7,CerS3 (CERS3) incorporates C26:0-CoA → Cer(d18:1/26:0); abnormal VLCFA ceramide species,Cutler2002,Ann Neurol 2002 (PMID 12112068)
+VLCFA_C24_0,Ceramide_VLCFA,positive,linear,,0.65,CerS2 (CERS2) incorporates C24:0-CoA → Cer(d18:1/24:0); dominant brain ceramide elongase,Hama2010,Biochim Biophys Acta 2010 (PMID 20184944)
+Ceramide_VLCFA,SM,negative,linear,,0.5,SMS (sphingomyelin synthase) balance shifted; nSMase/aSMase hydrolysis of SM → ceramide depletes SM,Hein2008,J Neurochem 2008 (PMID 18298656)
+Inflammation,Ceramide_VLCFA,positive,linear,,0.4,Inflammation activates acid sphingomyelinase (SMPD1) and neutral sphingomyelinase (SMPD2) → SM→Cer,Hein2008,J Neurochem 2008 (PMID 18298656)
+Ceramide_VLCFA,Demyelination,positive,linear,,0.5,Very-long-chain ceramides induce oligodendrocyte apoptosis via PP2A/JNK pathway; direct myelin loss,Hama2010,Biochim Biophys Acta 2010 (PMID 20184944)
+Ceramide_VLCFA,HexCer_VLCFA,positive,linear,,0.5,UGT8 (ceramide galactosyltransferase) uses VLCFA-ceramide → HexCer(d18:1/24:0) / HexCer(d18:1/26:0),SinghGroup,Singh group 1990s-2020s
+HexCer_VLCFA,Demyelination,positive,linear,,0.3,Abnormal HexCer species disrupt myelin galactosylceramide composition; myelin instability,SinghGroup,Singh group 1990s-2020s
+Demyelination,HexCer_released,positive,linear,,0.6,Active demyelination releases myelin GalCer (HexCer) into plasma; biomarker of lesion activity,Engelen2024,Plasma lipidomics 2020-2024

@@ -1,5 +1,7 @@
 Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
-LPC26_0,ALD_Severity,positive,logistic,,0.8,Higher LPC26:0 predicts severe phenotype,Billington2025,Phenotype correlation
-Inflammation,ALD_Severity,positive,logistic,,0.7,Inflammation increases severity,GeneReviews2023,Clinical observation
-Age,ALD_Severity,positive,logistic,,0.02,Older age increases severity risk,StatPearls2024,Epidemiological trend
-Sex,ALD_Severity,positive,logistic,if Sex = male,0.3,Male sex bias toward cerebral ALD,GeneReviews2023,Sex-linked presentation
+LPC26_0,ALD_Severity,positive,logistic,,0.8,Higher LPC 26:0 predicts severe/cerebral ALD phenotype; validated NBS biomarker,Billington2025,Phenotype correlation
+Inflammation,ALD_Severity,positive,logistic,,0.7,Neuroinflammation level correlates with cerebral ALD severity and lesion volume,GeneReviews2023,Clinical observation
+Demyelination,ALD_Severity,positive,logistic,,0.9,Demyelination is primary neurological severity marker; proxy for MRI Loes score,GeneReviews2023,MRI Loes score basis
+CE_VLCFA,ALD_Severity,positive,logistic,,0.4,Adrenal VLCFA-CE → adrenal insufficiency present in ~70% of males; independent severity axis,Moser1980,Ann Neurol 1980 (PMID 6776400)
+Age,ALD_Severity,positive,logistic,,0.02,Older age associates with AMN/adrenomyeloneuropathy phenotype accumulation,StatPearls2024,Epidemiological trend
+Sex,ALD_Severity,positive,logistic,if Sex = male,0.3,Male sex bias toward cerebral ALD; females mostly symptomatic carriers with milder myelopathy,GeneReviews2023,X-linked sex-biased presentation

@@ -1,5 +1,10 @@
 Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
-ABCD1_loss,Peroxi_BetaOx,negative,linear,,1.2,ABCD1 mutation reduces beta-oxidation,GeneReviews2023,Authoritative clinical mechanism
-ELOVL1_activity,VLCFA_C26_0,positive,linear,,0.7,ELOVL1 elongates C22->C26,Ofman2010,ELOVL1 knockdown lowers VLCFA
-Peroxi_BetaOx,VLCFA_C26_0,negative,linear,,0.9,Lower oxidation increases C26:0,StatPearls2024,Clinical reference for VLCFA metabolism
-Diet_VLCFA_load,VLCFA_C26_0,positive,linear,,0.4,Dietary VLCFA contributes,Reactome2024,Pathway annotation
+ABCD1_loss,Peroxi_BetaOx,negative,linear,,1.2,ABCD1 mutation reduces peroxisomal beta-oxidation capacity,GeneReviews2023,Authoritative clinical mechanism
+ELOVL1_activity,VLCFA_C26_0,positive,linear,,0.7,ELOVL1 elongates C22→C24→C26; primary VLCFA elongase in brain and adrenal,Ofman2010,ELOVL1 knockdown lowers VLCFA (PMID 20817924)
+Peroxi_BetaOx,VLCFA_C26_0,negative,linear,,0.9,Lower oxidation → C26:0 net accumulation,StatPearls2024,Clinical reference for VLCFA metabolism
+Diet_VLCFA_load,VLCFA_C26_0,positive,linear,,0.4,Dietary saturated VLCFA contributes to total C26:0 pool,Reactome2024,Pathway annotation
+ELOVL1_activity,VLCFA_C24_0,positive,linear,,0.5,ELOVL1 elongates C20→C22→C24; C24:0/C22:0 ratio is ALD diagnostic biomarker,Kemp2012,Nat Rev Neurol 2012 (PMID 22965358)
+Peroxi_BetaOx,VLCFA_C24_0,negative,linear,,0.7,Peroxisomal beta-oxidation degrades C24:0-CoA; loss raises C24:0,Kemp2012,Nat Rev Neurol 2012 (PMID 22965358)
+Sex,ABCD2_activity,positive,linear,if Sex = female,0.4,Estrogen upregulates ABCD2 in females providing partial VLCFA transport compensation,Fourcade2003,Hum Mol Genet 2003 (PMID 12915447)
+ABCD2_activity,VLCFA_C26_0,negative,linear,,0.35,ABCD2 partially substitutes ABCD1 for C26:0-CoA peroxisomal import,Fourcade2003,Hum Mol Genet 2003 (PMID 12915447)
+ABCD2_activity,VLCFA_C24_0,negative,linear,,0.3,ABCD2 also transports C24:0-CoA; reduces C24:0 accumulation in females,Fourcade2003,Hum Mol Genet 2003 (PMID 12915447)

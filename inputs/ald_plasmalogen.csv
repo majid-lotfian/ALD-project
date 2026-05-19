@@ -1,0 +1,5 @@
+Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
+Oxidative_Stress,Plasmalogen,negative,linear,,0.65,ROS selectively oxidizes vinyl-ether bonds in plasmalogens (PE-p/PC-p); plasmalogens act as antioxidant sinks and are consumed,Brites2009,Biochim Biophys Acta 2009 (PMID 19328222)
+Inflammation,Plasmalogen,negative,linear,,0.35,Neuroinflammation-associated ROS burst depletes plasmalogen pool in brain tissue; secondary to inflammatory oxidative stress,Brites2009,Biochim Biophys Acta 2009 (PMID 19328222)
+VLCFA_C26_0,Plasmalogen,negative,linear,,0.2,VLCFA membrane incorporation disrupts ether lipid-rich membrane microdomains; weak indirect effect on plasmalogen levels,Brites2009,Secondary membrane remodeling effect
+Plasmalogen,Inflammation,negative,linear,,0.3,Plasmalogens are anti-inflammatory; depletion removes this protective buffer and amplifies neuroinflammation,Brites2009,Antioxidant/anti-inflammatory role of vinyl-ether bond

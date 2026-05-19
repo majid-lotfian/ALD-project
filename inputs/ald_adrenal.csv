@@ -1,0 +1,7 @@
+Cause,Effect,Direction,Type,Condition,Coefficient_or_Level,Comment,RefKey,RefNote
+VLCFA_C26_0,CE_VLCFA,positive,linear,,1.0,VLCFA esterified to cholesterol → CE(24:0) and CE(26:0) accumulate in adrenal cortex lipid droplets,Moser1980,Ann Neurol 1980 (PMID 6776400)
+VLCFA_C24_0,CE_VLCFA,positive,linear,,0.7,C24:0 also esterified to cholesterol; CE(24:0) is a major accumulated species in adrenal foamy cells,Moser1980,Ann Neurol 1980 (PMID 6776400)
+Sex,CE_VLCFA,positive,linear,if Sex = male,0.4,Males more severely affected in adrenal glands; adrenal insufficiency in ~70% of males but rare in females,GeneReviews2023,Sex-linked adrenal involvement
+CE_VLCFA,Adrenal_Insufficiency,positive,threshold,CE_VLCFA > 1.0;above=1.0;below=0.1,strong,Expanded adrenal lipid droplets impair StAR-mediated cholesterol import → cortisol/aldosterone deficiency,Moser1980,Ann Neurol 1980 (PMID 6776400)
+CE_VLCFA,ALD_Severity,positive,linear,,0.4,Adrenal insufficiency is an independent severity dimension; often precedes neurological symptoms by years,GeneReviews2023,Clinical staging of ALD
+Adrenal_Insufficiency,ALD_Severity,positive,linear,,0.5,Untreated adrenal insufficiency worsens overall ALD disease burden and may accelerate cerebral progression,StatPearls2024,Clinical management importance
