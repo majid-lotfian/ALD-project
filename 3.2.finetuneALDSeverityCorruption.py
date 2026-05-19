@@ -372,7 +372,7 @@ def main():
 
         # Build indicator channels (no corruption -> zeros)
         #zeros_tr = torch.zeros_like(Xtr_t)
-        if args.ft_use_corrupt_train:
+        '''if args.ft_use_corrupt_train:
             # masked view (indicator = mask)
             x_masked, mask = apply_feature_mask_ft(Xtr_t, mask_ratio=args.ft_mask_ratio, mask_value=0.0)
             Xtr_in = torch.cat([x_masked, mask.float()], dim=1)
@@ -386,6 +386,13 @@ def main():
             Xtr_in = torch.cat([Xtr_t, zeros_tr], dim=1)
         zeros_va = torch.zeros_like(Xva_t)
         #Xtr_in = torch.cat([Xtr_t, zeros_tr], dim=1)  # (Ntr, 2*(D_omics+1))
+        Xva_in = torch.cat([Xva_t, zeros_va], dim=1)'''
+
+        # Keep clean training features; corruption will be generated per batch
+        Xtr_base = Xtr_t
+
+        # Validation stays clean with zero indicators
+        zeros_va = torch.zeros_like(Xva_t)
         Xva_in = torch.cat([Xva_t, zeros_va], dim=1)
 
         class_w = make_class_weights(ytr, n_classes).to(device)
@@ -399,8 +406,33 @@ def main():
             encoder.train()
             head.train()
 
-            for xb, yb in batch_iter(Xtr_in, ytr_t, cfg.batch_size, shuffle=True):
+            for xb_clean, yb in batch_iter(Xtr_base, ytr_t, cfg.batch_size, shuffle=True):
+                '''opt.zero_grad(set_to_none=True)
+
+                with autocast("cuda", dtype=amp_dtype, enabled=cfg.amp):
+                    z = encoder(xb)
+                    logits = head(z)
+                    loss = criterion(logits, yb)
+
+                if cfg.amp and cfg.amp_dtype == "fp16":
+                    scaler.scale(loss).backward()
+                    scaler.step(opt)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    opt.step()'''
+                    
                 opt.zero_grad(set_to_none=True)
+
+                if args.ft_use_corrupt_train:
+                    xb_masked, mask = apply_feature_mask_ft(
+                        xb_clean,
+                        mask_ratio=args.ft_mask_ratio,
+                        mask_value=0.0
+                    )
+                    xb = torch.cat([xb_masked, mask.float()], dim=1)
+                else:
+                    xb = torch.cat([xb_clean, torch.zeros_like(xb_clean)], dim=1)
 
                 with autocast("cuda", dtype=amp_dtype, enabled=cfg.amp):
                     z = encoder(xb)
@@ -414,7 +446,6 @@ def main():
                 else:
                     loss.backward()
                     opt.step()
-
             # Validate
             encoder.eval()
             head.eval()
@@ -456,6 +487,10 @@ def main():
                 if bad >= cfg.patience:
                     break
 
+        
+        
+        
+        
         # Evaluate best
         encoder.load_state_dict(best_state["encoder"])
         head.load_state_dict(best_state["head"])
