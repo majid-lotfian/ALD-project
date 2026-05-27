@@ -1,0 +1,19 @@
+Sample_ID,1_acyl_LPC_16:0,1_acyl_LPC_20:0,1_acyl_LPE_18:0,PC_34:0,severity,factor_string
+S00016570,144202.25,1968.0,18686.5,14109.25,0,subject type:Healthy control
+S00016571,271113.75,3709.5,27691.0,95337.75,0,subject type:Healthy control
+S00016572,217263.75,0.0,23460.25,61029.0,0,subject type:Healthy control
+S00016573,124691.75,0.0,16291.0,20454.0,0,subject type:Healthy control
+S00016574,105448.75,11429.5,7004.5,29874.25,0,subject type:Healthy control
+S00016575,109086.25,17932.5,16338.0,61158.75,0,subject type:Healthy control
+S00016581,107763.0,8532.5,13707.5,54629.75,1,subject type:Mild disease
+S00016580,103251.5,15363.5,22347.25,60348.75,1,subject type:Mild disease
+S00016579,102837.5,1229.5,16705.25,25618.25,1,subject type:Mild disease
+S00016578,133648.5,13126.0,8539.25,84158.75,1,subject type:Mild disease
+S00016577,222080.0,1277.0,31488.5,128280.0,1,subject type:Mild disease
+S00016576,268327.75,662.0,45519.75,125561.25,1,subject type:Mild disease
+S00016582,113183.5,6533.0,13222.5,31982.5,2,subject type:Severe disease
+S00016583,419012.0,0.0,29293.5,93315.5,2,subject type:Severe disease
+S00016584,154381.75,24641.5,15324.25,74357.75,2,subject type:Severe disease
+S00016585,207776.5,13506.0,37093.5,98347.75,2,subject type:Severe disease
+S00016586,179608.25,17378.0,19081.75,72902.75,2,subject type:Severe disease
+S00016587,163756.25,1691.5,18299.25,78306.75,2,subject type:Severe disease

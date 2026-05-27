@@ -1,0 +1,30 @@
+Sample_ID,1_acyl_LPC_16:0,1_acyl_LPE_18:0,PC_34:0,severity,factor_string
+S00019605,343981.5,83090.0,10398.5,0,Species:Homo sapiens | TYPE:Healthy control
+S00019606,328689.5,124602.0,14739.0,0,Species:Homo sapiens | TYPE:Healthy control
+S00019607,291279.5,96960.0,25482.5,0,Species:Homo sapiens | TYPE:Healthy control
+S00019608,298846.5,97191.0,46447.0,0,Species:Homo sapiens | TYPE:Healthy control
+S00019609,390830.5,79600.0,13926.0,0,Species:Homo sapiens | TYPE:Healthy control
+S00019610,297323.5,94618.0,43567.5,0,Species:Homo sapiens | TYPE:Healthy control
+S00019611,372659.5,99894.0,9868.0,0,Species:Homo sapiens | TYPE:Healthy control
+S00019627,191291.0,57762.0,30735.0,1,Species:Homo sapiens | TYPE:NLA
+S00019628,178937.5,42846.0,10487.0,1,Species:Homo sapiens | TYPE:NLA
+S00019629,245437.5,62547.0,24791.0,1,Species:Homo sapiens | TYPE:NLA
+S00019630,293492.0,109932.0,26566.5,1,Species:Homo sapiens | TYPE:NLA
+S00019622,640287.5,164753.0,39299.0,1,Species:Homo sapiens | TYPE:NLA
+S00019614,231521.5,60128.0,12819.5,1,Species:Homo sapiens | TYPE:NLA
+S00019621,455002.5,165255.0,67429.0,1,Species:Homo sapiens | TYPE:NLA
+S00019632,76783.0,10662.0,0.0,2,Species:Homo sapiens | TYPE:PLS
+S00019626,593602.5,782928.0,65340.5,2,Species:Homo sapiens | TYPE:PLS
+S00019625,274489.0,5987.0,1035.5,2,Species:Homo sapiens | TYPE:PLS
+S00019619,264157.0,78196.0,17729.5,2,Species:Homo sapiens | TYPE:PLS
+S00019633,430027.0,64297.0,15359.0,2,Species:Homo sapiens | TYPE:PLS
+S00019615,162158.0,18885.0,0.0,2,Species:Homo sapiens | TYPE:PLS
+S00019612,297525.0,99948.0,17378.5,2,Species:Homo sapiens | TYPE:PLS
+S00019620,240634.5,37587.0,0.0,2,Species:Homo sapiens | TYPE:PLS
+S00019634,263275.5,29198.0,17221.0,2,Species:Homo sapiens | TYPE:PLS
+S00019624,384109.5,89837.0,0.0,3,Species:Homo sapiens | TYPE:PL
+S00019618,403657.5,146468.0,0.0,3,Species:Homo sapiens | TYPE:PL
+S00019617,280155.0,136721.0,14938.0,3,Species:Homo sapiens | TYPE:PL
+S00019616,277196.0,70413.0,0.0,3,Species:Homo sapiens | TYPE:PL
+S00019613,418864.5,172735.0,27616.5,3,Species:Homo sapiens | TYPE:PL
+S00019631,74071.0,8386.0,0.0,3,Species:Homo sapiens | TYPE:PL

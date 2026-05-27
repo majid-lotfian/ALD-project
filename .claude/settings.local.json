@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"D:\\\\Post-doc\\\\labGPT\\\\projects\\\\ALD-project\" -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Get-ChildItem -Path \"D:\\\\Post-doc\\\\labGPT\\\\projects\\\\ALD-project\" -Recurse -Filter \"*.yaml\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('2.4.3.CausalModelSyntheticDataV3.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "WebSearch",
+      "WebFetch(domain:www.nature.com)",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "Bash(curl -L -A \"Mozilla/5.0\" -o \"SD1_lipidomics_males.xlsx\" \"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11387402/bin/43856_2024_605_MOESM4_ESM.xlsx\")",
+      "Bash(curl -L -A \"Mozilla/5.0\" -o \"SD3_lipidomics_females.xlsx\" \"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11387402/bin/43856_2024_605_MOESM6_ESM.xlsx\")",
+      "Bash(curl -L -A \"Mozilla/5.0\" -o \"SD5_LPC26_data.xlsx\" \"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11387402/bin/43856_2024_605_MOESM8_ESM.xlsx\")",
+      "Bash(curl -L -A \"Mozilla/5.0\" -o \"SD7_VLCFA_data.xlsx\" \"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11387402/bin/43856_2024_605_MOESM10_ESM.xlsx\")",
+      "Bash(python -c ' *)",
+      "WebFetch(domain:www.jlr.org)",
+      "WebFetch(domain:www.metabolomicsworkbench.org)",
+      "Bash(Remove-Item -Recurse -Force \"data\\\\external\")",
+      "Bash(python 2.5.ExternalDataPreprocessing.py)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(cat)",
+      "Bash(python /tmp/analyze_cols.py)",
+      "Bash(python *)"
+    ]
+  }
+}

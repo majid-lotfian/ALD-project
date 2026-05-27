@@ -1,0 +1,27 @@
+External ALD Datasets — Preprocessing Summary
+============================================================
+
+Sources: Metabolomics Workbench ST000741, ST000742
+Singh Lab / Henry Ford Health System / U. Michigan, 2017
+License: CC BY 4.0  |  DOI: 10.21228/M8HH47
+
+Data type: Untargeted LC-MS metabolomics
+Tissues: Fibroblast cell culture (ST000741), Post-mortem brain (ST000742)
+
+NOTE: Feature space mismatch with main plasma lipidomics dataset.
+These datasets contain general metabolomics (~300-400 metabolites),
+of which only 6-30 are lipid-like species.
+Direct feature-level merging with the 1810-lipid plasma dataset
+is not possible — use the *_lipids_aligned.csv files for partial
+overlap, or use these datasets independently (separate encoder).
+
+Severity label mapping:
+  ST000741: 0=Healthy control, 1=Mild disease, 2=Severe disease
+  ST000742 human: 0=Healthy control, 1=NLA (asymptomatic),
+                  2=PLS (AMN-like), 3=PL (cerebral ALD)
+  ST000742 mouse: 0=WT, 1=KO-M, 2=ALD-KO
+
+Processed files:
+  ST000741 fibroblasts: 18 samples, 659 metabolite features, labels: {0: 6, 1: 6, 2: 6}
+  ST000742 human brain: 29 samples, 139 metabolite features, labels: {0: 7, 1: 7, 2: 9, 3: 6}
+  ST000742 mouse brain: 9 samples, 139 metabolite features, labels: {0: 3, 1: 3, 2: 3}
