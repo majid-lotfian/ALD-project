@@ -1,0 +1,46 @@
+experiment:
+  name: finetune_v3
+  seed: 42
+
+paths:
+  output_root: outputs/
+
+data:
+  real_csv: ../data/ALD_lipidomics_merged-updated.csv
+  sex_col: sex
+  id_col: Sample_ID
+  target_column: severity
+  exclude_cols: []
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+
+model:
+  d_model: 256
+  num_layers: 6
+  nhead: 8
+  dim_feedforward: 512
+  dropout: 0.1
+  use_cls: true
+  value_hidden_dim: 64
+  value_encoder_layers: 2
+
+optimizer:
+  weight_decay: 0.0001
+
+finetuning:
+  from_scratch: false
+  ckpt_path: null           # path to pretrained checkpoint, or null for scratch
+  splits: 5
+  label_frac: 1.0
+  label_min_per_class: 1
+  freeze_mode: full         # full | partial | linear
+  unfreeze_last_layers: 2
+  lr_encoder: 0.00001
+  lr_head: 0.0001
+  epochs: 100
+  patience: 15
+  amp: true
+  amp_dtype: bf16
+  grad_accum_steps: 1
+  clip_grad_norm: 1.0

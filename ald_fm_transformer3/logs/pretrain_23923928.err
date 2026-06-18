@@ -1,0 +1,29 @@
+2026-06-16 16:38:59,049 | INFO | [DRY-RUN] Found 2 CSV files. World size: 1
+2026-06-16 16:38:59,288 | INFO | Feature count: 1811
+2026-06-16 16:39:18,889 | INFO | total_steps=2  warmup=2000  effective_batch=256
+2026-06-16 16:39:24,197 | INFO | Epoch 001 | step=2 | lr=3.00e-07 | train_loss=1.6855  val_loss=1.6722  mlm=0.9906  recon=1.3629  kl=0.215304
+2026-06-16 16:39:24,530 | INFO | DRY-RUN PASSED — all startup paths exercised successfully.
+2026-06-16 16:39:34,206 | INFO | Found 500 CSV files. World size: 4
+2026-06-16 16:39:34,370 | INFO | Feature count: 1811
+2026-06-16 17:40:24,750 | INFO | total_steps=175780  warmup=2000  effective_batch=1024
+/home/mlotfiandeloue1/.local/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:4876: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  warnings.warn(  # warn only once
+2026-06-16 18:53:52,598 | INFO | Epoch 001 | step=8789 | lr=2.99e-04 | train_loss=3.0644  val_loss=2.9293  mlm=2.7694  recon=0.3055  kl=14.408464
+2026-06-16 20:07:17,584 | INFO | Epoch 002 | step=17578 | lr=2.95e-04 | train_loss=2.8073  val_loss=2.9111  mlm=2.7670  recon=0.2741  kl=13.985106
+2026-06-16 21:20:43,389 | INFO | Epoch 003 | step=26367 | lr=2.87e-04 | train_loss=2.7944  val_loss=2.9038  mlm=2.7665  recon=0.2608  kl=13.772247
+2026-06-16 22:34:08,103 | INFO | Epoch 004 | step=35156 | lr=2.76e-04 | train_loss=2.7883  val_loss=2.8995  mlm=2.7655  recon=0.2544  kl=13.628530
+2026-06-16 23:47:31,508 | INFO | Epoch 005 | step=43945 | lr=2.63e-04 | train_loss=2.7845  val_loss=2.8973  mlm=2.7654  recon=0.2504  kl=13.387933
+2026-06-17 01:00:55,346 | INFO | Epoch 006 | step=52734 | lr=2.47e-04 | train_loss=2.7821  val_loss=2.8939  mlm=2.7636  recon=0.2474  kl=13.218826
+2026-06-17 02:14:19,006 | INFO | Epoch 007 | step=61523 | lr=2.29e-04 | train_loss=2.7802  val_loss=2.8929  mlm=2.7639  recon=0.2450  kl=13.015947
+2026-06-17 03:27:43,643 | INFO | Epoch 008 | step=70312 | lr=2.09e-04 | train_loss=2.7785  val_loss=2.8912  mlm=2.7633  recon=0.2431  kl=12.821218
+2026-06-17 04:41:07,794 | INFO | Epoch 009 | step=79101 | lr=1.89e-04 | train_loss=2.7775  val_loss=2.8909  mlm=2.7636  recon=0.2419  kl=12.692373
+2026-06-17 05:54:32,531 | INFO | Epoch 010 | step=87890 | lr=1.67e-04 | train_loss=2.7765  val_loss=2.8896  mlm=2.7631  recon=0.2405  kl=12.522053
+2026-06-17 07:07:56,184 | INFO | Epoch 011 | step=96679 | lr=1.46e-04 | train_loss=2.7757  val_loss=2.8895  mlm=2.7634  recon=0.2398  kl=12.400837
+2026-06-17 08:21:21,139 | INFO | Epoch 012 | step=105468 | lr=1.25e-04 | train_loss=2.7751  val_loss=2.8883  mlm=2.7627  recon=0.2389  kl=12.309744
+2026-06-17 09:34:44,935 | INFO | Epoch 013 | step=114257 | lr=1.05e-04 | train_loss=2.7746  val_loss=2.8884  mlm=2.7633  recon=0.2380  kl=12.215028
+2026-06-17 10:48:09,400 | INFO | Epoch 014 | step=123046 | lr=8.68e-05 | train_loss=2.7742  val_loss=2.8874  mlm=2.7626  recon=0.2374  kl=12.139118
+2026-06-17 12:01:34,232 | INFO | Epoch 015 | step=131835 | lr=7.04e-05 | train_loss=2.7734  val_loss=2.8882  mlm=2.7638  recon=0.2368  kl=12.086658
+2026-06-17 13:14:57,276 | INFO | Epoch 016 | step=140624 | lr=5.64e-05 | train_loss=2.7734  val_loss=2.8866  mlm=2.7625  recon=0.2362  kl=12.040507
+2026-06-17 14:28:20,956 | INFO | Epoch 017 | step=149413 | lr=4.50e-05 | train_loss=2.7733  val_loss=2.8867  mlm=2.7628  recon=0.2357  kl=12.024789
+2026-06-17 15:41:44,367 | INFO | Epoch 018 | step=158202 | lr=3.68e-05 | train_loss=2.7731  val_loss=2.8861  mlm=2.7625  recon=0.2352  kl=12.007470
+[2026-06-17T16:38:41.023] error: *** JOB 23923928 ON gcn10 CANCELLED AT 2026-06-17T16:38:41 DUE TO TIME LIMIT ***
